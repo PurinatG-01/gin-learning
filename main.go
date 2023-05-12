@@ -41,10 +41,9 @@ func landing(c *gin.Context) {
 }
 
 func test(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"status": http.StatusOK,
-		"msg":    "🚀 success",
-	})
+	data := map[string]any{"msg": "🚀 Yeahhh", "list": []int{1, 2, 3, 4, 5}}
+	body := ResponseMapper(http.StatusOK, data)
+	c.JSON(http.StatusOK, &body)
 }
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -60,4 +59,13 @@ func CORSMiddleware() gin.HandlerFunc {
 		}
 		c.Next()
 	}
+}
+
+type ApiResponse struct {
+	Status int            `json:"status"`
+	Data   map[string]any `json:"data"`
+}
+
+func ResponseMapper(status int, data map[string]any) ApiResponse {
+	return ApiResponse{Status: status, Data: data}
 }
