@@ -16,7 +16,8 @@ func NewEventHandler(service service.EventService) *EventHandler {
 	return &EventHandler{service: service}
 }
 
-func (s *EventHandler) Test(c *gin.Context) {
-	data := map[string]any{"msg": "🚀 KRUBB"}
+func (s *EventHandler) All(c *gin.Context) {
+	events, _ := s.service.All()
+	data := map[string]any{"msg": "🚀 KRUBB", "list": events}
 	c.JSON(http.StatusOK, utils.ResponseMapper(http.StatusOK, &data))
 }

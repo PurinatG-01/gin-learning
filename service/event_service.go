@@ -1,22 +1,24 @@
 package service
 
 import (
-	"context"
 	model "gin-learning/models"
+	"gin-learning/repository"
 )
 
 type EventService interface {
-	All(ctx context.Context) ([]model.Event, error)
+	All() (*[]model.Event, error)
 }
 
 // TODO: update to have repository
 type eventService struct {
+	repository repository.EventRepository
 }
 
-func NewEventService() EventService {
-	return &eventService{}
+func NewEventService(repository repository.EventRepository) EventService {
+	return &eventService{repository: repository}
 }
 
-func (s *eventService) All(ctx context.Context) ([]model.Event, error) {
-	return []model.Event{}, nil
+func (s *eventService) All() (*[]model.Event, error) {
+	events, _ := s.repository.All()
+	return events, nil
 }

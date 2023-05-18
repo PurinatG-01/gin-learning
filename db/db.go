@@ -13,7 +13,7 @@ type User struct {
 	Age  int    `sql:"age"`
 }
 
-func ConnectDatabase() {
+func ConnectDatabase() (*gorm.DB, error) {
 
 	dsn := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -29,5 +29,6 @@ func ConnectDatabase() {
 
 	// fmt.Printf("> %v %v \n", db, err)
 	// fmt.Printf(">>>>>>> result : %s", result)
+	return db, err
 
 }

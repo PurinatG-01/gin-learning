@@ -31,7 +31,7 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 
 	event := engine.Group("/event")
 	{
-		event.GET("/", app.Event.Test)
+		event.GET("/", app.Event.All)
 		event.POST("/", test)
 		event.DELETE("/", test)
 		event.PUT("/", test)
