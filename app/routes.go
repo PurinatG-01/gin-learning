@@ -1,32 +1,41 @@
-package routes
+package app
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type ApiResponse struct {
-	Status int            `json:"status"`
-	Data   map[string]any `json:"data"`
+func InitApp(ctx context.Context, engine *gin.Engine) {
+	app, _ := NewApp(ctx)
+	InitRoutes(ctx, engine, app)
 }
 
-func ResponseMapper(status int, data map[string]any) ApiResponse {
-	return ApiResponse{Status: status, Data: data}
-}
-
-func InitRoutes(engine *gin.Engine) {
+func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext) {
 
 	// GET routes
 	engine.GET("/", landing)
 	engine.GET("/ping", ping)
 	engine.GET("/test", test)
 
+	// Health
+	engine.GET("/health", app.Health.ServerCheck)
+
 	// Feed Post group
 	post := engine.Group("/post")
 	{
 		post.GET("/list", test)
 		post.POST("/", test)
+	}
+
+	event := engine.Group("/event")
+	{
+		event.GET("/", app.Event.Test)
+		event.POST("/", test)
+		event.DELETE("/", test)
+		event.PUT("/", test)
+
 	}
 
 }
@@ -45,6 +54,5 @@ func landing(c *gin.Context) {
 
 func test(c *gin.Context) {
 	data := map[string]any{"msg": "🚀 Yeahhh", "list": []int{1, 2, 3, 4, 5}}
-	body := ResponseMapper(http.StatusOK, data)
-	c.JSON(http.StatusOK, &body)
+	c.JSON(http.StatusOK, &data)
 }

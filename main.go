@@ -1,10 +1,11 @@
 package main
 
 import (
+	"context"
+	"gin-learning/app"
 	"gin-learning/db"
 	"gin-learning/log"
 	"gin-learning/middleware"
-	"gin-learning/routes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -16,10 +17,11 @@ func main() {
 	logger.Log("Sever opened ja")
 	engine := gin.Default()
 	engine.LoadHTMLGlob("templates/*")
+	ctx := context.Background()
 	// Set up cors middleware
 	middleware.InitMiddlewares(engine)
 	// Set up server routes
-	routes.InitRoutes(engine)
+	app.InitApp(ctx, engine)
 	// Set up database
 	db.ConnectDatabase()
 
