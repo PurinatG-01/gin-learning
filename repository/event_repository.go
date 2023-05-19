@@ -6,6 +6,7 @@ import (
 
 type EventRepository interface {
 	All() (*[]model.Event, error)
+	Create(event *model.Event) (bool, error)
 	// Load(ctx context.Context, id string) (*model.Event, error)
 	// Create(ctx context.Context, user *model.Event) (int64, error)
 	// Update(ctx context.Context, user *model.Event) (int64, error)

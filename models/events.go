@@ -3,11 +3,11 @@ package model
 import "time"
 
 type Event struct {
-	id          int        `sql:"id`
-	title       string     `sql:"title"`
-	description string     `sql:"description"`
-	startedAt   *time.Time `sql:"started_at"`
-	endedAt     *time.Time `sql:"ended_at"`
-	releasedAt  *time.Time `sql:"released_at"`
-	createdAt   *time.Time `sql:"created_at"`
+	Id          int        `gorm:"id" json:"id"`
+	Title       string     `gorm:"title" json:"title"`
+	Description string     `gorm:"description" json:"description"`
+	StartedAt   *time.Time `gorm:"started_at" json:"startedAt"`
+	EndedAt     *time.Time `gorm:"ended_at" json:"endedAt"`
+	ReleasedAt  *time.Time `gorm:"released_at" json:"releasedAt"`
+	CreatedAt   *time.Time `gorm:"created_at" json:"createdAt"`
 }

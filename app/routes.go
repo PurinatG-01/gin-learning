@@ -7,11 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitApp(ctx context.Context, engine *gin.Engine) {
-	app, _ := NewApp(ctx)
-	InitRoutes(ctx, engine, app)
-}
-
 func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext) {
 
 	// GET routes
@@ -32,9 +27,10 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 	event := engine.Group("/event")
 	{
 		event.GET("/", app.Event.All)
-		event.POST("/", test)
-		event.DELETE("/", test)
-		event.PUT("/", test)
+		event.GET("/:id", app.Event.All)
+		event.POST("/", app.Event.Create)
+		event.DELETE("/", app.Event.Delete)
+		event.PUT("/", app.Event.Update)
 
 	}
 

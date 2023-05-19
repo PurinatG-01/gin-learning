@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	model "gin-learning/models"
 
 	"gorm.io/gorm"
@@ -19,8 +18,10 @@ type eventAdapter struct {
 func (s *eventAdapter) All() (*[]model.Event, error) {
 	var events *[]model.Event
 	result := s.DB.Find(&events)
-	fmt.Printf("> [ALL] %v : \n", events)
-	fmt.Printf("> [result] : %v \n", result.RowsAffected)
-	fmt.Printf("> [result : error] : %v \n", result.Error)
-	return events, nil
+	return events, result.Error
+}
+
+func (s *eventAdapter) Create(event *model.Event) (bool, error) {
+	result := s.DB.Create(event)
+	return true, result.Error
 }

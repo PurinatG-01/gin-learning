@@ -2,10 +2,11 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"gin-learning/handler"
 	"gin-learning/repository"
 	"gin-learning/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ApplicationContext struct {
@@ -23,7 +24,6 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	}
 
 	eventRepository := repository.NewEventRepository(db)
-	fmt.Println(eventRepository)
 	eventService := service.NewEventService(eventRepository)
 	eventHandler := handler.NewEventHandler(eventService)
 
@@ -33,4 +33,9 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 		Event:  eventHandler,
 		Health: healthHandler,
 	}, nil
+}
+
+func InitApp(ctx context.Context, engine *gin.Engine) {
+	app, _ := NewApp(ctx)
+	InitRoutes(ctx, engine, app)
 }
