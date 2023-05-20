@@ -17,18 +17,6 @@ func ConnectDatabase() (*gorm.DB, error) {
 
 	dsn := fmt.Sprintf("%s", os.Getenv("DB_URL"))
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-
-	fmt.Println(db, err)
-
-	// user := User{Name: "Jinzhu", Age: 18}
-
-	// result := db.Create(&user)
-
-	// logger := log.InitLog(log.Logger{Name: "DB"})
-	// logger.Log("Init DB")
-
-	// fmt.Printf("> %v %v \n", db, err)
-	// fmt.Printf(">>>>>>> result : %s", result)
 	return db, err
 
 }

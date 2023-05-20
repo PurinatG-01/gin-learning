@@ -20,7 +20,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	db, err := repository.ConnectDatabase()
 
 	if err != nil {
-		panic("[APP] failed to connect database")
+		panic(err)
 	}
 
 	eventRepository := repository.NewEventRepository(db)

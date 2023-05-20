@@ -6,7 +6,6 @@ import (
 	"gin-learning/app"
 	"gin-learning/log"
 	"gin-learning/middleware"
-	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -24,6 +23,5 @@ func main() {
 	// Set up server routes
 	app.InitApp(ctx, engine)
 
-	port := os.Getenv("PORT")
-	engine.Run(fmt.Sprintf(":%v", port)) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	engine.Run(fmt.Sprintf(":8080")) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
