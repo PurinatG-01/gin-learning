@@ -10,4 +10,5 @@ type Event struct {
 	EndedAt     *time.Time `gorm:"ended_at" json:"endedAt"`
 	ReleasedAt  *time.Time `gorm:"released_at" json:"releasedAt"`
 	CreatedAt   *time.Time `gorm:"created_at" json:"createdAt"`
+	UpdatedAt   *time.Time `gorm:"updated_at" json:"updatedAt"`
 }

@@ -27,10 +27,10 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 	event := engine.Group("/event")
 	{
 		event.GET("/", app.Event.All)
-		event.GET("/:id", app.Event.All)
+		event.GET("/:id", app.Event.Get)
 		event.POST("/", app.Event.Create)
-		event.DELETE("/", app.Event.Delete)
-		event.PUT("/", app.Event.Update)
+		event.DELETE("/:id", app.Event.Delete)
+		event.PUT("/:id", app.Event.Update)
 
 	}
 

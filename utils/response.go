@@ -10,7 +10,7 @@ import (
 type ApiResponse struct {
 	Status int            `json:"status"`
 	Data   map[string]any `json:"data"`
-	Error  error          `json:"error"`
+	Error  string         `json:"error"`
 }
 
 type Responder struct {
@@ -25,14 +25,19 @@ func (r *Responder) ResponseSuccess(c *gin.Context, data *map[string]interface{}
 func (r *Responder) ResponseCreateSuccess(c *gin.Context) {
 	c.JSON(http.StatusCreated, ApiResponse{Status: http.StatusCreated})
 }
+
+func (r *Responder) ResponseUpdateSuccess(c *gin.Context) {
+	c.JSON(http.StatusNoContent, ApiResponse{Status: http.StatusNoContent})
+}
+
 func (r *Responder) ResponseError(c *gin.Context, str string) {
-	c.JSON(http.StatusBadRequest, ApiResponse{Status: http.StatusBadRequest, Error: errors.New(str)})
+	c.JSON(http.StatusBadRequest, ApiResponse{Status: http.StatusBadRequest, Error: errors.New(str).Error()})
 }
 
 func (r *Responder) ResponseServerError(c *gin.Context, str string) {
-	c.JSON(http.StatusInternalServerError, ApiResponse{Status: http.StatusInternalServerError, Error: errors.New(str)})
+	c.JSON(http.StatusInternalServerError, ApiResponse{Status: http.StatusInternalServerError, Error: errors.New(str).Error()})
 }
 
 func (r *Responder) ResponseUnauthorized(c *gin.Context) {
-	c.JSON(http.StatusUnauthorized, ApiResponse{Status: http.StatusUnauthorized, Error: errors.New(UNAUTHORIZED_MESSAGE)})
+	c.JSON(http.StatusUnauthorized, ApiResponse{Status: http.StatusUnauthorized, Error: errors.New(UNAUTHORIZED_MESSAGE).Error()})
 }
