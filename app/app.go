@@ -10,8 +10,10 @@ import (
 )
 
 type ApplicationContext struct {
-	Event  *handler.EventHandler
-	Health *handler.HealthHandler
+	Event   *handler.EventHandler
+	Ticket  *handler.TicketHandler
+	Health  *handler.HealthHandler
+	Utility *handler.UtilityHandler
 }
 
 func NewApp(ctx context.Context) (*ApplicationContext, error) {
@@ -23,15 +25,27 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 		panic(err)
 	}
 
+	// Init Event app
 	eventRepository := repository.NewEventRepository(db)
 	eventService := service.NewEventService(eventRepository)
 	eventHandler := handler.NewEventHandler(eventService)
 
+	// Init Ticket app
+	ticketRepository := repository.NewTicketRepository(db)
+	ticketService := service.NewTicketService(ticketRepository)
+	ticketHandler := handler.NewTicketHandler(ticketService)
+
+	// Init Health app
 	healthHandler := handler.NewHealthHandler()
 
+	// Utility app
+	utilityHandler := handler.NewUtilityHandler()
+
 	return &ApplicationContext{
-		Event:  eventHandler,
-		Health: healthHandler,
+		Event:   eventHandler,
+		Ticket:  ticketHandler,
+		Health:  healthHandler,
+		Utility: utilityHandler,
 	}, nil
 }
 

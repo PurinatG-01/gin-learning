@@ -34,6 +34,18 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 
 	}
 
+	ticket := engine.Group("/ticket")
+	{
+		ticket.GET("/", app.Ticket.All)
+		ticket.POST("/", app.Ticket.Create)
+
+	}
+
+	utility := engine.Group("/utility")
+	{
+		utility.GET("/shuffle", app.Utility.Shuffle)
+	}
+
 }
 
 func ping(c *gin.Context) {
