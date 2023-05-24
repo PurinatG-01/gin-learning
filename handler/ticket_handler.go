@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"encoding/json"
 	model "gin-learning/models"
 	"gin-learning/service"
 	"gin-learning/utils"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -44,13 +46,58 @@ func (s *TicketHandler) Create(c *gin.Context) {
 }
 
 func (s *TicketHandler) Get(c *gin.Context) {
+	param_id := c.Param("id")
+	id, param_err := strconv.Atoi(param_id)
+	if param_err != nil {
+		s.responder.ResponseError(c, param_err.Error())
+		return
+	}
+	ticket, err := s.service.Get(id)
+	if err != nil {
+		s.responder.ResponseError(c, err.Error())
+		return
+	}
+	b, _ := json.Marshal(&ticket)
+	var data map[string]interface{}
+	_ = json.Unmarshal(b, &data)
+	s.responder.ResponseSuccess(c, &data)
+	return
 
 }
 
 func (s *TicketHandler) Delete(c *gin.Context) {
-
+	param_id := c.Param("id")
+	id, param_err := strconv.Atoi(param_id)
+	if param_err != nil {
+		s.responder.ResponseError(c, param_err.Error())
+		return
+	}
+	_, err := s.service.Delete(id)
+	if err != nil {
+		s.responder.ResponseError(c, err.Error())
+		return
+	}
+	s.responder.ResponseUpdateSuccess(c)
+	return
 }
 
 func (s *TicketHandler) Update(c *gin.Context) {
-
+	param_id := c.Param("id")
+	id, param_err := strconv.Atoi(param_id)
+	if param_err != nil {
+		s.responder.ResponseError(c, param_err.Error())
+		return
+	}
+	var ticket model.Ticket
+	if err := c.BindJSON(&ticket); err != nil {
+		s.responder.ResponseError(c, err.Error())
+		return
+	}
+	_, err := s.service.Update(id, ticket)
+	if err != nil {
+		s.responder.ResponseError(c, err.Error())
+		return
+	}
+	s.responder.ResponseUpdateSuccess(c)
+	return
 }

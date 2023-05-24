@@ -34,3 +34,13 @@ func (s *ticketAdapter) Get(id int) (model.Ticket, error) {
 	}
 	return ticket, result.Error
 }
+
+func (s *ticketAdapter) Update(ticket *model.Ticket) (bool, error) {
+	result := s.DB.Model(ticket).Updates(ticket)
+	return true, result.Error
+}
+
+func (s *ticketAdapter) Delete(ticket *model.Ticket) (bool, error) {
+	result := s.DB.Delete(ticket)
+	return true, result.Error
+}
