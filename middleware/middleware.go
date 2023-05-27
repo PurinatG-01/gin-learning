@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"gin-learning/service"
+	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -22,5 +24,24 @@ func CORSMiddlewares() gin.HandlerFunc {
 			return
 		}
 		c.Next()
+	}
+}
+
+func AuthorizeJWT() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		const BEARER_SCHEMA = "Bearer "
+		authHeader := c.GetHeader("Authorization")
+		if len(authHeader) <= 0 {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+		tokenString := authHeader[len(BEARER_SCHEMA):]
+		token, _ := service.NewJWTService().ValidateToken(tokenString)
+		if token.Valid {
+			c.Next()
+		} else {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
 	}
 }

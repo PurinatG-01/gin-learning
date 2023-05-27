@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"gin-learning/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,8 +15,21 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 	engine.GET("/ping", ping)
 	engine.GET("/test", test)
 
+	// Authntication routes
+	engine.POST("/login", app.Auth.Login)
+
 	// Health
 	engine.GET("/health", app.Health.ServerCheck)
+
+	// Authorized routes
+	authen := engine.Group("/authen")
+	authen.Use(middleware.AuthorizeJWT())
+	{
+		authen.GET("/test", func(c *gin.Context) {
+			data := map[string]interface{}{"msg": "Authentication success!!"}
+			c.JSON(http.StatusOK, &data)
+		})
+	}
 
 	// Feed Post group
 	post := engine.Group("/post")
