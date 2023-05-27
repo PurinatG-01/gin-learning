@@ -10,6 +10,7 @@ import (
 )
 
 type ApplicationContext struct {
+	Auth    *handler.AuthHandler
 	Event   *handler.EventHandler
 	Ticket  *handler.TicketHandler
 	Health  *handler.HealthHandler
@@ -24,6 +25,13 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	if err != nil {
 		panic(err)
 	}
+
+	// Init authen app
+	email := "purinat.san@gmail.com"
+	password := "1234"
+	jwtService := service.NewJWTService()
+	loginService := service.NewLoginService(email, password)
+	authHandler := handler.NewAuthHandler(loginService, jwtService)
 
 	// Init Event app
 	eventRepository := repository.NewEventRepository(db)
@@ -42,6 +50,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	utilityHandler := handler.NewUtilityHandler()
 
 	return &ApplicationContext{
+		Auth:    authHandler,
 		Event:   eventHandler,
 		Ticket:  ticketHandler,
 		Health:  healthHandler,
