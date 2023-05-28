@@ -17,6 +17,7 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 
 	// Authntication routes
 	engine.POST("/login", app.Auth.Login)
+	engine.POST("/signup", app.Auth.Signup)
 
 	// Health
 	engine.GET("/health", app.Health.ServerCheck)

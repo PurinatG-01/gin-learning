@@ -27,11 +27,11 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	}
 
 	// Init authen app
-	email := "purinat.san@gmail.com"
-	password := "1234"
+	userRepository := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepository)
 	jwtService := service.NewJWTService()
-	loginService := service.NewLoginService(email, password)
-	authHandler := handler.NewAuthHandler(loginService, jwtService)
+	loginService := service.NewLoginService(userRepository)
+	authHandler := handler.NewAuthHandler(loginService, jwtService, userService)
 
 	// Init Event app
 	eventRepository := repository.NewEventRepository(db)

@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	model "gin-learning/models"
 	"os"
 	"time"
 
@@ -9,13 +10,15 @@ import (
 )
 
 type JWTService interface {
-	GenerateToken(email string, isUser bool) string
+	GenerateToken(user model.User) string
 	ValidateToken(token string) (*jwt.Token, error)
 }
 
 type authCustomClaims struct {
-	Name string `json:"name"`
-	User bool   `json:"user"`
+	Id            int    `json:"id"`
+	Username      string `json:"username"`
+	DisplayName   string `json:"displayName"`
+	DisplayImgUrl string `json:"displayImgUrl"`
 	jwt.StandardClaims
 }
 
@@ -39,22 +42,24 @@ func getSecretKey() string {
 	return secret
 }
 
-func (s *jwtService) GenerateToken(email string, isUser bool) string {
+func (s *jwtService) GenerateToken(user model.User) string {
+	// Id:            user.Id,
+	// 	Username:      user.Username,
+	// 	DisplayName:   user.DisplayName,
+	// 	DisplayImgUrl: user.DisplayImgUrl
 	claims := &authCustomClaims{
-		email,
-		isUser,
+		user.Id,
+		user.Username,
+		user.DisplayName,
+		user.DisplayImgUrl,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
 			Issuer:    s.issure,
 			IssuedAt:  time.Now().Unix(),
 		},
 	}
-	fmt.Printf("> secret: %v \n", s.secretKey)
-	fmt.Printf("> claims: %v \n", *claims)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
 	t, err := token.SignedString([]byte(s.secretKey))
-	fmt.Printf("> %v \n", t)
 	if err != nil {
 		panic(err)
 	}
