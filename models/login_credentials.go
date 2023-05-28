@@ -1,6 +1,6 @@
 package model
 
 type LoginCredentials struct {
-	Email    string `form:"email"`
+	Username string `form:"username"`
 	Password string `form:"password"`
 }
