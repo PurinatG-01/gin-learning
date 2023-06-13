@@ -31,7 +31,7 @@ func (s *TicketHandler) All(c *gin.Context) {
 }
 
 func (s *TicketHandler) Create(c *gin.Context) {
-	var ticket model.Ticket
+	var ticket model.Tickets
 	if err := c.BindJSON(&ticket); err != nil {
 		s.responder.ResponseError(c, err.Error())
 		return
@@ -88,7 +88,7 @@ func (s *TicketHandler) Update(c *gin.Context) {
 		s.responder.ResponseError(c, param_err.Error())
 		return
 	}
-	var ticket model.Ticket
+	var ticket model.Tickets
 	if err := c.BindJSON(&ticket); err != nil {
 		s.responder.ResponseError(c, err.Error())
 		return

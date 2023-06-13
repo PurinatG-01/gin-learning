@@ -33,15 +33,15 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	loginService := service.NewLoginService(userRepository)
 	authHandler := handler.NewAuthHandler(loginService, jwtService, userService)
 
-	// Init Event app
-	eventRepository := repository.NewEventRepository(db)
-	eventService := service.NewEventService(eventRepository)
-	eventHandler := handler.NewEventHandler(eventService)
-
 	// Init Ticket app
 	ticketRepository := repository.NewTicketRepository(db)
 	ticketService := service.NewTicketService(ticketRepository)
 	ticketHandler := handler.NewTicketHandler(ticketService)
+
+	// Init Event app
+	eventRepository := repository.NewEventRepository(db)
+	eventService := service.NewEventService(eventRepository, userRepository, ticketRepository)
+	eventHandler := handler.NewEventHandler(eventService)
 
 	// Init Health app
 	healthHandler := handler.NewHealthHandler()
