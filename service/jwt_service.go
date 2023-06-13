@@ -11,7 +11,7 @@ import (
 
 type JWTService interface {
 	GenerateToken(user model.User) string
-	ValidateToken(token string) (*jwt.Token, error)
+	ValidateToken(token string) (*jwt.Token, error, jwt.MapClaims)
 }
 
 type authCustomClaims struct {
@@ -43,10 +43,6 @@ func getSecretKey() string {
 }
 
 func (s *jwtService) GenerateToken(user model.User) string {
-	// Id:            user.Id,
-	// 	Username:      user.Username,
-	// 	DisplayName:   user.DisplayName,
-	// 	DisplayImgUrl: user.DisplayImgUrl
 	claims := &authCustomClaims{
 		user.Id,
 		user.Username,
@@ -66,11 +62,13 @@ func (s *jwtService) GenerateToken(user model.User) string {
 	return t
 }
 
-func (s *jwtService) ValidateToken(token string) (*jwt.Token, error) {
-	return jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+func (s *jwtService) ValidateToken(token string) (*jwt.Token, error, jwt.MapClaims) {
+	claims := jwt.MapClaims{}
+	jwtToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, isValid := token.Method.(*jwt.SigningMethodHMAC); !isValid {
 			return nil, fmt.Errorf("Invalid token", token.Header["alg"])
 		}
 		return []byte(s.secretKey), nil
 	})
+	return jwtToken, err, claims
 }

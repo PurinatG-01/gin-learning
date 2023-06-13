@@ -15,20 +15,23 @@ type EventService interface {
 }
 
 type eventService struct {
-	repository repository.EventRepository
+	eventRepository  repository.EventRepository
+	userRepository   repository.UserRepository
+	ticketRepository repository.TicketRepository
 }
 
-func NewEventService(repository repository.EventRepository) EventService {
-	return &eventService{repository: repository}
+func NewEventService(eventRepository repository.EventRepository, userRepository repository.UserRepository, ticketRepository repository.TicketRepository) EventService {
+	return &eventService{eventRepository: eventRepository, userRepository: userRepository, ticketRepository: ticketRepository}
 }
 
 func (s *eventService) All() (*[]model.Event, error) {
-	events, err := s.repository.All()
+	events, err := s.eventRepository.All()
 	return events, err
 }
 
+// TODO: update create event to
 func (s *eventService) Create(event model.Event) (bool, error) {
-	_, err := s.repository.Create(&event)
+	_, err := s.eventRepository.Create(&event)
 	if err != nil {
 		return true, err
 	}
@@ -36,13 +39,13 @@ func (s *eventService) Create(event model.Event) (bool, error) {
 }
 
 func (s *eventService) Get(id int) (model.Event, error) {
-	event, err := s.repository.Get(id)
+	event, err := s.eventRepository.Get(id)
 	return event, err
 }
 
 func (s *eventService) Delete(id int) (bool, error) {
 	event := model.Event{Id: id}
-	_, err := s.repository.Delete(&event)
+	_, err := s.eventRepository.Delete(&event)
 	if err != nil {
 		return true, err
 	}
@@ -53,7 +56,7 @@ func (s *eventService) Update(id int, event model.Event) (bool, error) {
 	event.Id = id
 	now := time.Now()
 	event.UpdatedAt = &now
-	_, err := s.repository.Update(&event)
+	_, err := s.eventRepository.Update(&event)
 	if err != nil {
 		return true, err
 	}
