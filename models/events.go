@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-type Event struct {
+type Events struct {
 	Id               int        `gorm:"id" json:"id"`
 	Title            string     `gorm:"title" json:"title"`
 	Description      string     `gorm:"description" json:"description"`
@@ -13,4 +13,15 @@ type Event struct {
 	UpdatedAt        *time.Time `gorm:"updated_at" json:"updatedAt"`
 	TotalTickets     int        `gorm:"total_tickets" json:"totalTickets"`
 	AvailableTickets int        `gorm:"available_tickets" json:"availableTickets"`
+}
+
+type FormEvent struct {
+	Title            string     `form:"title"`
+	Description      string     `form:"description"`
+	StartedAt        *time.Time `form:"startedAt"`
+	EndedAt          *time.Time `form:"endedAt"`
+	ReleasedAt       *time.Time `form:"releasedAt"`
+	TotalTickets     int        `form:"totalTickets"`
+	AvailableTickets int        `form:"availableTickets"`
+	TicketPrice      int        `form:"ticketPrice"`
 }

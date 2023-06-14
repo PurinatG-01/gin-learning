@@ -10,7 +10,7 @@ import (
 )
 
 type JWTService interface {
-	GenerateToken(user model.User) string
+	GenerateToken(user model.Users) string
 	ValidateToken(token string) (*jwt.Token, error, jwt.MapClaims)
 }
 
@@ -42,7 +42,7 @@ func getSecretKey() string {
 	return secret
 }
 
-func (s *jwtService) GenerateToken(user model.User) string {
+func (s *jwtService) GenerateToken(user model.Users) string {
 	claims := &authCustomClaims{
 		user.Id,
 		user.Username,

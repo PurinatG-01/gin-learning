@@ -1,17 +1,18 @@
 package service
 
 import (
+	"errors"
 	model "gin-learning/models"
 	"gin-learning/repository"
 	"time"
 )
 
 type EventService interface {
-	All() (*[]model.Event, error)
-	Create(model.Event) (bool, error)
-	Get(int) (model.Event, error)
+	All() (*[]model.Events, error)
+	Create(model.FormEvent, int) (bool, error)
+	Get(int) (model.Events, error)
 	Delete(id int) (bool, error)
-	Update(int, model.Event) (bool, error)
+	Update(int, model.Events) (bool, error)
 }
 
 type eventService struct {
@@ -24,27 +25,43 @@ func NewEventService(eventRepository repository.EventRepository, userRepository 
 	return &eventService{eventRepository: eventRepository, userRepository: userRepository, ticketRepository: ticketRepository}
 }
 
-func (s *eventService) All() (*[]model.Event, error) {
+func (s *eventService) All() (*[]model.Events, error) {
 	events, err := s.eventRepository.All()
 	return events, err
 }
 
 // TODO: update create event to
-func (s *eventService) Create(event model.Event) (bool, error) {
+func (s *eventService) Create(form_event model.FormEvent, userId int) (bool, error) {
+	isAdmin, admin_err := s.userRepository.IsAdmin(userId)
+	if admin_err != nil {
+		return false, admin_err
+	}
+	if !isAdmin {
+		return false, errors.New("Not admin")
+	}
+	event := s.MapFormEventToEvents(form_event)
+	event.AvailableTickets = event.TotalTickets
 	_, err := s.eventRepository.Create(&event)
 	if err != nil {
 		return true, err
 	}
+	// ticketList := make([]model.Tickets, event.TotalTickets)
+	// for i := range ticketList {
+	// 	ticketList[i] = model.Tickets{
+	// 		Price: form_event.TicketPrice,
+	// 		EventId: form_event.,
+	// 	}
+	// }
 	return true, nil
 }
 
-func (s *eventService) Get(id int) (model.Event, error) {
+func (s *eventService) Get(id int) (model.Events, error) {
 	event, err := s.eventRepository.Get(id)
 	return event, err
 }
 
 func (s *eventService) Delete(id int) (bool, error) {
-	event := model.Event{Id: id}
+	event := model.Events{Id: id}
 	_, err := s.eventRepository.Delete(&event)
 	if err != nil {
 		return true, err
@@ -52,7 +69,7 @@ func (s *eventService) Delete(id int) (bool, error) {
 	return true, nil
 }
 
-func (s *eventService) Update(id int, event model.Event) (bool, error) {
+func (s *eventService) Update(id int, event model.Events) (bool, error) {
 	event.Id = id
 	now := time.Now()
 	event.UpdatedAt = &now
@@ -61,4 +78,16 @@ func (s *eventService) Update(id int, event model.Event) (bool, error) {
 		return true, err
 	}
 	return true, nil
+}
+
+func (s *eventService) MapFormEventToEvents(form_event model.FormEvent) model.Events {
+	return model.Events{
+		Title:            form_event.Title,
+		Description:      form_event.Description,
+		StartedAt:        form_event.StartedAt,
+		EndedAt:          form_event.EndedAt,
+		ReleasedAt:       form_event.ReleasedAt,
+		TotalTickets:     form_event.TotalTickets,
+		AvailableTickets: form_event.AvailableTickets,
+	}
 }

@@ -16,19 +16,19 @@ type userAdapter struct {
 	DB *gorm.DB
 }
 
-func (s *userAdapter) All() (*[]model.User, error) {
-	var users *[]model.User
+func (s *userAdapter) All() (*[]model.Users, error) {
+	var users *[]model.Users
 	result := s.DB.Find(&users)
 	return users, result.Error
 }
 
-func (s *userAdapter) Create(user *model.User) (bool, error) {
+func (s *userAdapter) Create(user *model.Users) (bool, error) {
 	result := s.DB.Create(user)
 	return true, result.Error
 }
 
-func (s *userAdapter) Get(id int) (model.User, error) {
-	var user model.User
+func (s *userAdapter) Get(id int) (model.Users, error) {
+	var user model.Users
 	result := s.DB.First(&user, id)
 	if result.RowsAffected == 0 {
 		return user, errors.New("[GET] user id not found")
@@ -36,19 +36,19 @@ func (s *userAdapter) Get(id int) (model.User, error) {
 	return user, result.Error
 }
 
-func (s *userAdapter) Update(user *model.User) (bool, error) {
+func (s *userAdapter) Update(user *model.Users) (bool, error) {
 	result := s.DB.Model(user).Updates(user)
 	return true, result.Error
 }
 
-func (s *userAdapter) Delete(user *model.User) (bool, error) {
+func (s *userAdapter) Delete(user *model.Users) (bool, error) {
 	result := s.DB.Delete(user)
 	return true, result.Error
 }
 
 func (s *userAdapter) IsExist(key string, value string) (bool, error) {
 	var exists bool
-	err := s.DB.Model(model.User{}).
+	err := s.DB.Model(model.Users{}).
 		Select("count(*) > 0").
 		Where(fmt.Sprintf("%s = ?", key), value).
 		Find(&exists).
@@ -60,8 +60,22 @@ func (s *userAdapter) IsExist(key string, value string) (bool, error) {
 	return exists, err
 }
 
-func (s *userAdapter) GetByKey(key string, value string) (model.User, error) {
-	var userStruct model.User
+func (s *userAdapter) IsAdmin(id int) (bool, error) {
+	var user model.Users
+	result := s.DB.First(&user, id)
+	if result.RowsAffected == 0 {
+		return false, errors.New("[GET] user id not found")
+	} else if result.Error != nil {
+		return false, result.Error
+	}
+	if user.IsAdmin {
+		return true, nil
+	}
+	return false, nil
+}
+
+func (s *userAdapter) GetByKey(key string, value string) (model.Users, error) {
+	var userStruct model.Users
 	result := s.DB.Where(fmt.Sprintf("%s = ?", key), value).First(&userStruct)
 	fmt.Printf("\n\n> %+v, %+v \n\n", userStruct, nil)
 	if result.RowsAffected != 1 {

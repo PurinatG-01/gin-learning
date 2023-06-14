@@ -32,12 +32,22 @@ func (s *EventHandler) All(c *gin.Context) {
 }
 
 func (s *EventHandler) Create(c *gin.Context) {
-	var event model.Event
-	if err := c.BindJSON(&event); err != nil {
-		s.responder.ResponseError(c, err.Error())
+	userId, conv_err := strconv.Atoi(c.GetString("x-user-id"))
+	if conv_err != nil {
+		s.responder.ResponseError(c, conv_err.Error())
 		return
 	}
-	_, err := s.service.Create(event)
+
+	// Binding form event
+	var form_event model.FormEvent
+	bind_err := c.ShouldBind(&form_event)
+	if bind_err != nil {
+		s.responder.ResponseError(c, bind_err.Error())
+		return
+	}
+
+	// Create Event
+	_, err := s.service.Create(form_event, userId)
 	if err != nil {
 		s.responder.ResponseError(c, err.Error())
 		return
@@ -88,7 +98,7 @@ func (s *EventHandler) Update(c *gin.Context) {
 		s.responder.ResponseError(c, param_err.Error())
 		return
 	}
-	var event model.Event
+	var event model.Events
 	if err := c.BindJSON(&event); err != nil {
 		s.responder.ResponseError(c, err.Error())
 		return

@@ -10,11 +10,11 @@ import (
 )
 
 type UserService interface {
-	All() (*[]model.User, error)
+	All() (*[]model.Users, error)
 	Create(user model.FormUser) (bool, error)
-	Get(id int) (model.User, error)
+	Get(id int) (model.Users, error)
 	Delete(id int) (bool, error)
-	Update(id int, user model.User) (bool, error)
+	Update(id int, user model.Users) (bool, error)
 	IsUsernameExist(username string) (bool, error)
 }
 
@@ -26,7 +26,7 @@ type userService struct {
 	repository repository.UserRepository
 }
 
-func (s *userService) All() (*[]model.User, error) {
+func (s *userService) All() (*[]model.Users, error) {
 	users, err := s.repository.All()
 	return users, err
 }
@@ -45,7 +45,7 @@ func (s *userService) Create(form_user model.FormUser) (bool, error) {
 
 	}
 	// Mapping FormUser to DB User
-	user := model.User{
+	user := model.Users{
 		Username:      form_user.Username,
 		DisplayName:   form_user.DisplayName,
 		DisplayImgUrl: form_user.DisplayImgUrl,
@@ -56,13 +56,13 @@ func (s *userService) Create(form_user model.FormUser) (bool, error) {
 	return true, err
 }
 
-func (s *userService) Get(id int) (model.User, error) {
+func (s *userService) Get(id int) (model.Users, error) {
 	user, err := s.repository.Get(id)
 	return user, err
 }
 
 func (s *userService) Delete(id int) (bool, error) {
-	user := model.User{Id: id}
+	user := model.Users{Id: id}
 	_, err := s.repository.Delete(&user)
 	if err != nil {
 		return true, err
@@ -70,7 +70,7 @@ func (s *userService) Delete(id int) (bool, error) {
 	return true, nil
 }
 
-func (s *userService) Update(id int, user model.User) (bool, error) {
+func (s *userService) Update(id int, user model.Users) (bool, error) {
 	user.Id = id
 	now := time.Now()
 	user.UpdatedAt = &now

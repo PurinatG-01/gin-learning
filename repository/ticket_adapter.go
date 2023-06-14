@@ -26,6 +26,11 @@ func (s *ticketAdapter) Create(ticket *model.Tickets) (bool, error) {
 	return true, result.Error
 }
 
+func (s *ticketAdapter) CreateMultiple(ticketsList []model.Tickets, batchSize int) (bool, error) {
+	result := s.DB.CreateInBatches(ticketsList, batchSize)
+	return true, result.Error
+}
+
 func (s *ticketAdapter) Get(id int) (model.Tickets, error) {
 	var ticket model.Tickets
 	result := s.DB.First(&ticket, id)

@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type User struct {
+type Users struct {
 	Id            int        `gorm:"id" json:"id"`
 	Username      string     `gorm:"username" json:"username" form:"username"`
 	DisplayName   string     `gorm:"display_name" json:"displayName" form:"displayName"`
