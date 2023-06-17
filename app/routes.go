@@ -54,7 +54,8 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 	ticket := engine.Group("/ticket")
 	{
 		ticket.GET("/", app.Ticket.All)
-		ticket.POST("/", app.Ticket.Create)
+		ticket.Use(middleware.UserAuthorizeJWT()).POST("/purchase", app.Ticket.Purchase)
+		// ticket.POST("/", app.Ticket.Create)
 		ticket.GET("/:id", app.Ticket.Get)
 		ticket.DELETE("/:id", app.Ticket.Delete)
 		ticket.PUT("/:id", app.Ticket.Update)

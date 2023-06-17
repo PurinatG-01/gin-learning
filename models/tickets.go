@@ -11,3 +11,8 @@ type Tickets struct {
 	OwnerId     int        `gorm:"owner_id" json:"ownerId"`
 	PurchasedAt *time.Time `gorm:"purchasedAt" json:"purchasedAt"`
 }
+
+type FormTicket struct {
+	EventId int `gorm:"event_id" form:"eventId" binding:"required"`
+	Amount  int `form:"amount" binding:"required"`
+}

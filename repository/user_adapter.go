@@ -77,7 +77,6 @@ func (s *userAdapter) IsAdmin(id int) (bool, error) {
 func (s *userAdapter) GetByKey(key string, value string) (model.Users, error) {
 	var userStruct model.Users
 	result := s.DB.Where(fmt.Sprintf("%s = ?", key), value).First(&userStruct)
-	fmt.Printf("\n\n> %+v, %+v \n\n", userStruct, nil)
 	if result.RowsAffected != 1 {
 		return userStruct, errors.New(fmt.Sprintf("%s : %s found more than 1 (rows affeceted more than 1)", key, value))
 	} else if result.Error != nil {

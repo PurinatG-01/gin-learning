@@ -14,6 +14,7 @@ type Users struct {
 	CreatedAt     *time.Time `gorm:"created_at" json:"createdAt"`
 	UpdatedAt     *time.Time `gorm:"updated_at" json:"updatedAt"`
 	Password      string     `gorm:"password" json:"password"`
+	TotalMoney    int        `gorm:"total_money" json:"totalMoney"`
 }
 
 type FormUser struct {

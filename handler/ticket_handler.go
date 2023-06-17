@@ -45,6 +45,36 @@ func (s *TicketHandler) Create(c *gin.Context) {
 	return
 }
 
+func (s *TicketHandler) Purchase(c *gin.Context) {
+	// #1 Get userId, eventId
+	str_userId := c.GetString("x-user-id")
+	userId, conv_err := strconv.Atoi(str_userId)
+	var form_ticket model.FormTicket
+	if conv_err != nil {
+		s.responder.ResponseError(c, conv_err.Error())
+		return
+	}
+	bind_err := c.ShouldBind(&form_ticket)
+	if bind_err != nil {
+		s.responder.ResponseError(c, bind_err.Error())
+		return
+	}
+	// #2 Ticket.service purchase ticket
+	_, purchase_err, is_serv_err := s.service.Purchase(form_ticket, userId)
+	// #2.1 Error (Money not enough, Create error etc.) => (400, 500)
+	if purchase_err != nil {
+		if is_serv_err {
+			s.responder.ResponseServerError(c, purchase_err.Error())
+			return
+		} else {
+			s.responder.ResponseError(c, purchase_err.Error())
+			return
+		}
+	}
+	// #2.2 Success => 200
+	s.responder.ResponseSuccess(c, &map[string]interface{}{"ticket": model.Tickets{}})
+}
+
 func (s *TicketHandler) Get(c *gin.Context) {
 	param_id := c.Param("id")
 	id, param_err := strconv.Atoi(param_id)

@@ -45,13 +45,6 @@ func (s *eventService) Create(form_event model.FormEvent, userId int) (bool, err
 	if err != nil {
 		return true, err
 	}
-	// ticketList := make([]model.Tickets, event.TotalTickets)
-	// for i := range ticketList {
-	// 	ticketList[i] = model.Tickets{
-	// 		Price: form_event.TicketPrice,
-	// 		EventId: form_event.,
-	// 	}
-	// }
 	return true, nil
 }
 
@@ -89,5 +82,6 @@ func (s *eventService) MapFormEventToEvents(form_event model.FormEvent) model.Ev
 		ReleasedAt:       form_event.ReleasedAt,
 		TotalTickets:     form_event.TotalTickets,
 		AvailableTickets: form_event.AvailableTickets,
+		TicketPrice:      form_event.TicketPrice,
 	}
 }

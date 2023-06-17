@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 	model "gin-learning/models"
 
 	"gorm.io/gorm"
@@ -43,4 +44,15 @@ func (s *eventAdapter) Update(event *model.Events) (bool, error) {
 func (s *eventAdapter) Delete(event *model.Events) (bool, error) {
 	result := s.DB.Delete(event)
 	return true, result.Error
+}
+
+func (s *eventAdapter) GetByKey(key string, value string) (model.Events, error) {
+	var eventStruct model.Events
+	result := s.DB.Where(fmt.Sprintf("%s = ?", key), value).First(&eventStruct)
+	if result.RowsAffected != 1 {
+		return eventStruct, errors.New(fmt.Sprintf("%s : %s found more than 1 (rows affeceted more than 1)", key, value))
+	} else if result.Error != nil {
+		return eventStruct, result.Error
+	}
+	return eventStruct, nil
 }
