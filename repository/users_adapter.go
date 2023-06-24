@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	model "gin-learning/models"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -83,4 +84,14 @@ func (s *userAdapter) GetByKey(key string, value string) (model.Users, error) {
 		return userStruct, result.Error
 	}
 	return userStruct, nil
+}
+
+// WithTrx enables repository with transaction
+func (s userAdapter) WithTrx(trxHandle *gorm.DB) UserRepository {
+	if trxHandle == nil {
+		log.Print("[Users] Transaction Database not found")
+		return &userAdapter{DB: trxHandle}
+	}
+	s.DB = trxHandle
+	return &userAdapter{DB: trxHandle}
 }

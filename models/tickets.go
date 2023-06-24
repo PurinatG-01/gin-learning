@@ -1,10 +1,14 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Tickets struct {
-	Id          int        `gorm:"id" json:"id"`
-	Price       int        `gorm:"price" json:"price"`
+	Id          string     `gorm:"id" json:"id"`
 	EventId     int        `gorm:"event_id" json:"eventId"`
 	CreatedAt   *time.Time `gorm:"created_at" json:"createdAt"`
 	UpdatedAt   *time.Time `gorm:"updated_at" json:"updatedAt"`
@@ -15,4 +19,11 @@ type Tickets struct {
 type FormTicket struct {
 	EventId int `gorm:"event_id" form:"eventId" binding:"required"`
 	Amount  int `form:"amount" binding:"required"`
+}
+
+func (s *Tickets) BeforeCreate(tx *gorm.DB) (err error) {
+	now := time.Now()
+	s.Id = uuid.New().String()
+	s.PurchasedAt = &now
+	return
 }

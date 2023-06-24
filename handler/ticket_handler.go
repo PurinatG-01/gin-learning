@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type TicketHandler struct {
@@ -60,7 +61,8 @@ func (s *TicketHandler) Purchase(c *gin.Context) {
 		return
 	}
 	// #2 Ticket.service purchase ticket
-	_, purchase_err, is_serv_err := s.service.Purchase(form_ticket, userId)
+	txHandle := c.MustGet("db_trx").(*gorm.DB)
+	ticket, purchase_err, is_serv_err := s.service.WithTrx(txHandle).Purchase(form_ticket, userId)
 	// #2.1 Error (Money not enough, Create error etc.) => (400, 500)
 	if purchase_err != nil {
 		if is_serv_err {
@@ -72,7 +74,7 @@ func (s *TicketHandler) Purchase(c *gin.Context) {
 		}
 	}
 	// #2.2 Success => 200
-	s.responder.ResponseSuccess(c, &map[string]interface{}{"ticket": model.Tickets{}})
+	s.responder.ResponseSuccess(c, &map[string]interface{}{"ticket": ticket})
 }
 
 func (s *TicketHandler) Get(c *gin.Context) {
@@ -97,12 +99,7 @@ func (s *TicketHandler) Get(c *gin.Context) {
 
 func (s *TicketHandler) Delete(c *gin.Context) {
 	param_id := c.Param("id")
-	id, param_err := strconv.Atoi(param_id)
-	if param_err != nil {
-		s.responder.ResponseError(c, param_err.Error())
-		return
-	}
-	_, err := s.service.Delete(id)
+	_, err := s.service.Delete(param_id)
 	if err != nil {
 		s.responder.ResponseError(c, err.Error())
 		return
@@ -113,17 +110,12 @@ func (s *TicketHandler) Delete(c *gin.Context) {
 
 func (s *TicketHandler) Update(c *gin.Context) {
 	param_id := c.Param("id")
-	id, param_err := strconv.Atoi(param_id)
-	if param_err != nil {
-		s.responder.ResponseError(c, param_err.Error())
-		return
-	}
 	var ticket model.Tickets
 	if err := c.BindJSON(&ticket); err != nil {
 		s.responder.ResponseError(c, err.Error())
 		return
 	}
-	_, err := s.service.Update(id, ticket)
+	_, err := s.service.Update(param_id, ticket)
 	if err != nil {
 		s.responder.ResponseError(c, err.Error())
 		return

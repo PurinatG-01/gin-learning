@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	model "gin-learning/models"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -21,14 +22,14 @@ func (s *ticketAdapter) All() (*[]model.Tickets, error) {
 	return tickets, result.Error
 }
 
-func (s *ticketAdapter) Create(ticket *model.Tickets) (bool, error) {
+func (s *ticketAdapter) Create(ticket *model.Tickets) (model.Tickets, error) {
 	result := s.DB.Create(ticket)
-	return true, result.Error
+	return *ticket, result.Error
 }
 
-func (s *ticketAdapter) CreateMultiple(ticketsList []model.Tickets, batchSize int) (bool, error) {
+func (s *ticketAdapter) CreateMultiple(ticketsList []model.Tickets, batchSize int) ([]model.Tickets, error) {
 	result := s.DB.CreateInBatches(ticketsList, batchSize)
-	return true, result.Error
+	return ticketsList, result.Error
 }
 
 func (s *ticketAdapter) Get(id int) (model.Tickets, error) {
@@ -48,4 +49,20 @@ func (s *ticketAdapter) Update(ticket *model.Tickets) (bool, error) {
 func (s *ticketAdapter) Delete(ticket *model.Tickets) (bool, error) {
 	result := s.DB.Delete(ticket)
 	return true, result.Error
+}
+
+func (s *ticketAdapter) Count(ticket *model.Tickets) (int64, error) {
+	var count int64
+	result := s.DB.Model(&model.Tickets{}).Where(ticket).Count(&count)
+	return count, result.Error
+}
+
+// WithTrx enables repository with transaction
+func (s ticketAdapter) WithTrx(trxHandle *gorm.DB) TicketRepository {
+	if trxHandle == nil {
+		log.Print("[Ticket] Transaction Database not found")
+		return &ticketAdapter{DB: trxHandle}
+	}
+	s.DB = trxHandle
+	return &ticketAdapter{DB: trxHandle}
 }

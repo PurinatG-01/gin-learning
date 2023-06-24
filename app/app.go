@@ -7,6 +7,7 @@ import (
 	"gin-learning/service"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type ApplicationContext struct {
@@ -15,6 +16,7 @@ type ApplicationContext struct {
 	Ticket  *handler.TicketHandler
 	Health  *handler.HealthHandler
 	Utility *handler.UtilityHandler
+	DB      *gorm.DB
 }
 
 func NewApp(ctx context.Context) (*ApplicationContext, error) {
@@ -29,6 +31,8 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	userRepository := repository.NewUserRepository(db)
 	ticketRepository := repository.NewTicketRepository(db)
 	eventRepository := repository.NewEventRepository(db)
+	ticketTransactionRepository := repository.NewTicketTransactionRepository(db)
+	usersAccessRepository := repository.NewUsersAccessRepository(db)
 
 	// #2 Init Services
 	// #2.1 Init authen/jwt/user services
@@ -36,7 +40,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	jwtService := service.NewJWTService()
 	loginService := service.NewLoginService(userRepository)
 	// #2.2 Init ticket service
-	ticketService := service.NewTicketService(ticketRepository, eventRepository, userRepository)
+	ticketService := service.NewTicketService(ticketRepository, eventRepository, userRepository, ticketTransactionRepository, usersAccessRepository)
 	// #2.3 Init event service
 	eventService := service.NewEventService(eventRepository, userRepository, ticketRepository)
 
@@ -58,6 +62,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 		Ticket:  ticketHandler,
 		Health:  healthHandler,
 		Utility: utilityHandler,
+		DB:      db,
 	}, nil
 }
 

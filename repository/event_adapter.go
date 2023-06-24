@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	model "gin-learning/models"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -55,4 +56,14 @@ func (s *eventAdapter) GetByKey(key string, value string) (model.Events, error) 
 		return eventStruct, result.Error
 	}
 	return eventStruct, nil
+}
+
+// WithTrx enables repository with transaction
+func (s eventAdapter) WithTrx(trxHandle *gorm.DB) EventRepository {
+	if trxHandle == nil {
+		log.Print("[Event] Transaction Database not found")
+		return &eventAdapter{DB: trxHandle}
+	}
+	s.DB = trxHandle
+	return &eventAdapter{DB: trxHandle}
 }
