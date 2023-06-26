@@ -27,9 +27,9 @@ func (s *ticketAdapter) Create(ticket *model.Tickets) (model.Tickets, error) {
 	return *ticket, result.Error
 }
 
-func (s *ticketAdapter) CreateMultiple(ticketsList []model.Tickets, batchSize int) ([]model.Tickets, error) {
+func (s *ticketAdapter) CreateMultiple(ticketsList *[]model.Tickets, batchSize int) ([]model.Tickets, error) {
 	result := s.DB.CreateInBatches(ticketsList, batchSize)
-	return ticketsList, result.Error
+	return *ticketsList, result.Error
 }
 
 func (s *ticketAdapter) Get(id int) (model.Tickets, error) {

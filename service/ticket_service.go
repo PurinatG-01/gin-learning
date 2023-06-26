@@ -6,6 +6,7 @@ import (
 	"gin-learning/repository"
 	"time"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -90,19 +91,37 @@ func (s *ticketService) Purchase(form_ticket model.FormTicket, userId int) (mode
 	// #2.2 Success => continue
 	// #3 Create Ticket from total amount
 	ticket := s.MapFormTicketToTickets(form_ticket, event, userId)
-	ticket, ticket_err := s.ticketRepository.Create(&ticket)
+	ticket_list := []model.Tickets{}
+	now := time.Now()
+	ticket.PurchasedAt = &now
+	for i := 0; i < form_ticket.Amount; i++ {
+		ticket.Id = uuid.New().String()
+		ticket_list = append(ticket_list, ticket)
+	}
+	_, ticket_err := s.ticketRepository.CreateMultiple(&ticket_list, 20)
 	if ticket_err != nil {
 		return ticket, ticket_err, true
 	}
 	// #4 Create Ticket transaction from total amount
-	ticket_transaction := model.TicketsTransaction{TicketId: ticket.Id, PurchaserId: userId, EventId: event.Id}
-	_, ticket_transaction_err := s.ticketTransactionRepository.Create(&ticket_transaction)
+	ticket_transaction := model.TicketsTransaction{TransactionId: uuid.New().String(), PurchaserId: userId, EventId: event.Id}
+	ticket_transaction_list := []model.TicketsTransaction{}
+	for i := 0; i < form_ticket.Amount; i++ {
+		ticket_transaction.Id = uuid.New().String()
+		ticket_transaction.TicketId = ticket_list[i].Id
+		ticket_transaction_list = append(ticket_transaction_list, ticket_transaction)
+	}
+	_, ticket_transaction_err := s.ticketTransactionRepository.CreateMultiple(&ticket_transaction_list, 20)
 	if ticket_transaction_err != nil {
 		return ticket, ticket_transaction_err, true
 	}
 	// #5 Create Ticket user access from total amount
-	users_access := model.UsersAccess{TicketId: ticket.Id, UserId: userId, EventId: event.Id}
-	_, users_access_err := s.usersAccessRepository.Create(&users_access)
+	users_access := model.UsersAccess{UserId: userId, EventId: event.Id}
+	users_access_list := []model.UsersAccess{}
+	for i := 0; i < form_ticket.Amount; i++ {
+		users_access.TicketId = ticket_list[i].Id
+		users_access_list = append(users_access_list, users_access)
+	}
+	_, users_access_err := s.usersAccessRepository.CreateMultiple(&users_access_list, 20)
 	if users_access_err != nil {
 		return ticket, users_access_err, true
 	}

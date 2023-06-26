@@ -21,7 +21,7 @@ type EventRepository interface {
 type TicketRepository interface {
 	All() (*[]model.Tickets, error)
 	Create(tickets *model.Tickets) (model.Tickets, error)
-	CreateMultiple(ticketsList []model.Tickets, batchSize int) ([]model.Tickets, error)
+	CreateMultiple(ticketsList *[]model.Tickets, batchSize int) ([]model.Tickets, error)
 	Get(id int) (model.Tickets, error)
 	Update(ticket *model.Tickets) (bool, error)
 	Delete(ticket *model.Tickets) (bool, error)
@@ -32,7 +32,7 @@ type TicketRepository interface {
 type UsersAccessRepository interface {
 	All() (*[]model.UsersAccess, error)
 	Create(tickets *model.UsersAccess) (model.UsersAccess, error)
-	CreateMultiple(users_access []model.UsersAccess, batchSize int) (bool, error)
+	CreateMultiple(users_access *[]model.UsersAccess, batchSize int) (bool, error)
 	Get(id int) (model.UsersAccess, error)
 	Update(ticket *model.UsersAccess) (bool, error)
 	Delete(ticket *model.UsersAccess) (bool, error)
@@ -55,5 +55,6 @@ type TicketTransactionRepository interface {
 	// All() (*[]model.TicketsTransaction, error)
 	// Get(id string) (model.TicketsTransaction, error)
 	Create(ticketTransaction *model.TicketsTransaction) (model.TicketsTransaction, error)
+	CreateMultiple(ticketsList *[]model.TicketsTransaction, batchSize int) ([]model.TicketsTransaction, error)
 	WithTrx(trxHandle *gorm.DB) TicketTransactionRepository
 }

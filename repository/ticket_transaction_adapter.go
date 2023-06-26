@@ -20,6 +20,11 @@ func (s *ticketTransactionAdapter) Create(ticketTransaction *model.TicketsTransa
 	return *ticketTransaction, result.Error
 }
 
+func (s *ticketTransactionAdapter) CreateMultiple(transactionList *[]model.TicketsTransaction, batchSize int) ([]model.TicketsTransaction, error) {
+	result := s.DB.CreateInBatches(transactionList, batchSize)
+	return *transactionList, result.Error
+}
+
 // WithTrx enables repository with transaction
 func (s ticketTransactionAdapter) WithTrx(trxHandle *gorm.DB) TicketTransactionRepository {
 	if trxHandle == nil {

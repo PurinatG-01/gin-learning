@@ -27,7 +27,7 @@ func (s *usersAccessAdapter) Create(users_access *model.UsersAccess) (model.User
 	return *users_access, result.Error
 }
 
-func (s *usersAccessAdapter) CreateMultiple(users_access_list []model.UsersAccess, batchSize int) (bool, error) {
+func (s *usersAccessAdapter) CreateMultiple(users_access_list *[]model.UsersAccess, batchSize int) (bool, error) {
 	result := s.DB.CreateInBatches(users_access_list, batchSize)
 	return true, result.Error
 }

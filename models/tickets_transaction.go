@@ -8,11 +8,12 @@ import (
 )
 
 type TicketsTransaction struct {
-	Id          string     `gorm:"id" json:"id"`
-	TicketId    string     `gorm:"ticket_id" json:"ticketId"`
-	PurchaserId int        `gorm:"purchaser_id" json:"purchaserId"`
-	EventId     int        `gorm:"event_id" json:"eventId"`
-	CreatedAt   *time.Time `gorm:"created_at" json:"createdAt"`
+	Id            string     `gorm:"id" json:"id"`
+	TicketId      string     `gorm:"ticket_id" json:"ticketId"`
+	PurchaserId   int        `gorm:"purchaser_id" json:"purchaserId"`
+	EventId       int        `gorm:"event_id" json:"eventId"`
+	CreatedAt     *time.Time `gorm:"created_at" json:"createdAt"`
+	TransactionId string     `gorm:"transaction_id" json:"transactionId"`
 }
 
 func (s *TicketsTransaction) BeforeCreate(tx *gorm.DB) (err error) {
