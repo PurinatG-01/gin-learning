@@ -40,7 +40,7 @@ func (s *eventService) Create(form_event model.FormEvent, userId int) (bool, err
 		return false, errors.New("Not admin")
 	}
 	event := s.MapFormEventToEvents(form_event)
-	event.AvailableTickets = &event.TotalTickets
+	// event.AvailableTickets = &event.TotalTickets
 	_, err := s.eventRepository.Create(&event)
 	if err != nil {
 		return true, err
@@ -75,13 +75,13 @@ func (s *eventService) Update(id int, event model.Events) (bool, error) {
 
 func (s *eventService) MapFormEventToEvents(form_event model.FormEvent) model.Events {
 	return model.Events{
-		Title:            form_event.Title,
-		Description:      form_event.Description,
-		StartedAt:        form_event.StartedAt,
-		EndedAt:          form_event.EndedAt,
-		ReleasedAt:       form_event.ReleasedAt,
-		TotalTickets:     form_event.TotalTickets,
-		AvailableTickets: &form_event.AvailableTickets,
-		TicketPrice:      form_event.TicketPrice,
+		Title:        form_event.Title,
+		Description:  form_event.Description,
+		StartedAt:    form_event.StartedAt,
+		EndedAt:      form_event.EndedAt,
+		ReleasedAt:   form_event.ReleasedAt,
+		TotalTickets: form_event.TotalTickets,
+		// AvailableTickets: &form_event.AvailableTickets,
+		TicketPrice: form_event.TicketPrice,
 	}
 }

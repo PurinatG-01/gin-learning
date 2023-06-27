@@ -74,8 +74,14 @@ func (s *ticketService) Purchase(form_ticket model.FormTicket, userId int) (mode
 	if event_err != nil {
 		return model.Tickets{}, event_err, true
 	}
-	// #1.1 Out of ticket => error
-	if *event.AvailableTickets < form_ticket.Amount {
+	// #1.1.1 Update Event available tickets by counting from tickets
+	ticket_count, ticket_count_err := s.ticketRepository.Count(&model.Tickets{EventId: event.Id})
+	if ticket_count_err != nil {
+		return model.Tickets{}, ticket_count_err, true
+	}
+	available_tickets := int(int64(event.TotalTickets) - ticket_count)
+	// #1.1.2 Out of ticket => error
+	if available_tickets < form_ticket.Amount {
 		return model.Tickets{}, errors.New("Out of ticket"), false
 	}
 	// #1.2 Success => continue
@@ -125,17 +131,7 @@ func (s *ticketService) Purchase(form_ticket model.FormTicket, userId int) (mode
 	if users_access_err != nil {
 		return ticket, users_access_err, true
 	}
-	// #6 Update Event available tickets by counting from tickets
-	ticket_count, ticket_count_err := s.ticketRepository.Count(&model.Tickets{EventId: event.Id})
-	if ticket_count_err != nil {
-		return ticket, ticket_count_err, true
-	}
-	available_tickets := int(int64(event.TotalTickets) - ticket_count)
-	event.AvailableTickets = &available_tickets
-	_, update_event_err := s.eventRepository.Update(&event)
-	if update_event_err != nil {
-		return ticket, update_event_err, true
-	}
+	// #6 Update user total money
 	user.TotalMoney = user.TotalMoney - (event.TicketPrice * form_ticket.Amount)
 	_, update_user_err := s.userRepository.Update(&user)
 	if update_user_err != nil {
