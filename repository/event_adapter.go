@@ -28,6 +28,14 @@ func (s *eventAdapter) Create(event *model.Events) (bool, error) {
 	return true, result.Error
 }
 
+func (s *eventAdapter) List(page int, limit int) (model.Pagination[model.Events], error) {
+	var events *[]model.Events
+	pagination := model.Pagination[model.Events]{Page: page, Limit: limit}
+	result := s.DB.Scopes(Paginate(events, &pagination, s.DB)).Find(&events)
+	pagination.List = *events
+	return pagination, result.Error
+}
+
 func (s *eventAdapter) Get(id int) (model.Events, error) {
 	var event model.Events
 	result := s.DB.First(&event, id)

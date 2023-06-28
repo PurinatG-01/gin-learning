@@ -10,6 +10,7 @@ import (
 type EventService interface {
 	All() (*[]model.Events, error)
 	Create(model.FormEvent, int) (bool, error)
+	List(page int, limit int) (model.Pagination[model.Events], error)
 	Get(int) (model.Events, error)
 	Delete(id int) (bool, error)
 	Update(int, model.Events) (bool, error)
@@ -30,7 +31,6 @@ func (s *eventService) All() (*[]model.Events, error) {
 	return events, err
 }
 
-// TODO: update create event to
 func (s *eventService) Create(form_event model.FormEvent, userId int) (bool, error) {
 	isAdmin, admin_err := s.userRepository.IsAdmin(userId)
 	if admin_err != nil {
@@ -40,12 +40,16 @@ func (s *eventService) Create(form_event model.FormEvent, userId int) (bool, err
 		return false, errors.New("Not admin")
 	}
 	event := s.MapFormEventToEvents(form_event)
-	// event.AvailableTickets = &event.TotalTickets
 	_, err := s.eventRepository.Create(&event)
 	if err != nil {
 		return true, err
 	}
 	return true, nil
+}
+
+func (s *eventService) List(page int, limit int) (model.Pagination[model.Events], error) {
+	events_pagination, err := s.eventRepository.List(page, limit)
+	return events_pagination, err
 }
 
 func (s *eventService) Get(id int) (model.Events, error) {
