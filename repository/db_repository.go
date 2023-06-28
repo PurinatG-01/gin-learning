@@ -9,6 +9,7 @@ import (
 type EventRepository interface {
 	All() (*[]model.Events, error)
 	Create(event *model.Events) (bool, error)
+	List(page int, limit int) (model.Pagination[model.Events], error)
 	Get(int) (model.Events, error)
 	Update(*model.Events) (bool, error)
 	Delete(*model.Events) (bool, error)

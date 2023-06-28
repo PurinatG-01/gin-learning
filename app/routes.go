@@ -44,6 +44,7 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 	event := engine.Group("/event")
 	{
 		event.GET("/", app.Event.All)
+		event.GET("/list", app.Event.List)
 		event.GET("/:id", app.Event.Get)
 		event.Use(middleware.UserAuthorizeJWT()).POST("/", app.Event.Create)
 		// event.DELETE("/:id", app.Event.Delete)

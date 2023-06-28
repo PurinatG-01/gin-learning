@@ -31,6 +31,42 @@ func (s *EventHandler) All(c *gin.Context) {
 	return
 }
 
+func (s *EventHandler) List(c *gin.Context) {
+	str_page := c.Query("page")
+	str_limit := c.Query("limit")
+	var page, limit int
+	if str_page == "" {
+		page = 1
+	} else {
+		conv_page, page_err := strconv.Atoi(str_page)
+		page = conv_page
+		if page_err != nil {
+			s.responder.ResponseError(c, page_err.Error())
+			return
+		}
+	}
+	if str_limit == "" {
+		limit = 10
+	} else {
+		conv_limit, limit_err := strconv.Atoi(str_limit)
+		limit = conv_limit
+		if limit_err != nil {
+			s.responder.ResponseError(c, limit_err.Error())
+			return
+		}
+	}
+	events, list_err := s.service.List(page, limit)
+	if list_err != nil {
+		s.responder.ResponseError(c, list_err.Error())
+		return
+	}
+	marshal_events, _ := json.Marshal(&events)
+	var data map[string]interface{}
+	_ = json.Unmarshal(marshal_events, &data)
+	s.responder.ResponseSuccess(c, &data)
+	return
+}
+
 func (s *EventHandler) Create(c *gin.Context) {
 	userId, conv_err := strconv.Atoi(c.GetString("x-user-id"))
 	if conv_err != nil {
@@ -68,9 +104,9 @@ func (s *EventHandler) Get(c *gin.Context) {
 		s.responder.ResponseError(c, err.Error())
 		return
 	}
-	b, _ := json.Marshal(&event)
+	marshal_event, _ := json.Marshal(&event)
 	var data map[string]interface{}
-	_ = json.Unmarshal(b, &data)
+	_ = json.Unmarshal(marshal_event, &data)
 	s.responder.ResponseSuccess(c, &data)
 	return
 }
