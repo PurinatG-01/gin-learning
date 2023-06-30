@@ -17,6 +17,16 @@ type Users struct {
 	TotalMoney    int        `gorm:"total_money" json:"totalMoney"`
 }
 
+type PublicUser struct {
+	Id            int        `json:"id"`
+	Username      string     `json:"username"`
+	DisplayName   string     `json:"displayName"`
+	DisplayImgUrl string     `json:"displayImgUrl"`
+	Email         string     `json:"email"`
+	CreatedAt     *time.Time `json:"createdAt"`
+	UpdatedAt     *time.Time `json:"updatedAt"`
+}
+
 type FormUser struct {
 	Username      string `json:"username" form:"username"`
 	DisplayName   string `json:"displayName" form:"displayName"`

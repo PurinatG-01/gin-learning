@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"gin-learning/middleware"
 	"net/http"
 
@@ -23,24 +22,6 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 	// Health
 	engine.GET("/health", app.Health.ServerCheck)
 
-	// Authorized routes
-	authen := engine.Group("/authen")
-	authen.Use(middleware.UserAuthorizeJWT())
-	{
-		authen.GET("/test", func(c *gin.Context) {
-			userId := c.GetString("x-user-id")
-			username := c.GetString("x-username")
-			data := map[string]interface{}{"msg": fmt.Sprintf("[%s:%s]Authentication success!!]", userId, username)}
-			c.JSON(http.StatusOK, &data)
-		})
-	}
-
-	post := engine.Group("/post")
-	{
-		post.GET("/list", test)
-		post.POST("/", test)
-	}
-
 	event := engine.Group("/event")
 	{
 		event.GET("/", app.Event.All)
@@ -49,7 +30,6 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 		event.Use(middleware.UserAuthorizeJWT()).POST("/", app.Event.Create)
 		// event.DELETE("/:id", app.Event.Delete)
 		// event.PUT("/:id", app.Event.Update)
-
 	}
 
 	ticket := engine.Group("/ticket")
@@ -61,6 +41,15 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 		ticket.DELETE("/:id", app.Ticket.Delete)
 		ticket.PUT("/:id", app.Ticket.Update)
 
+	}
+
+	user := engine.Group("/user")
+	{
+		user.GET("/:id", app.User.GetPublic)
+		userAuthen := user.Use(middleware.UserAuthorizeJWT())
+		{
+			userAuthen.GET("/tickets", app.User.Tickets)
+		}
 	}
 
 	utility := engine.Group("/utility")

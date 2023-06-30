@@ -13,21 +13,24 @@ type UserService interface {
 	All() (*[]model.Users, error)
 	Create(user model.FormUser) (bool, error)
 	Get(id int) (model.Users, error)
+	GetPublic(id int) (model.PublicUser, error)
+	GetTicketsList(userId int, page int, limit int) (model.Pagination[model.Tickets], error)
 	Delete(id int) (bool, error)
 	Update(id int, user model.Users) (bool, error)
 	IsUsernameExist(username string) (bool, error)
 }
 
-func NewUserService(repository repository.UserRepository) UserService {
-	return &userService{repository: repository}
+func NewUserService(userRepository repository.UserRepository, ticketRepository repository.TicketRepository) UserService {
+	return &userService{userRepository: userRepository, ticketRepository: ticketRepository}
 }
 
 type userService struct {
-	repository repository.UserRepository
+	userRepository   repository.UserRepository
+	ticketRepository repository.TicketRepository
 }
 
 func (s *userService) All() (*[]model.Users, error) {
-	users, err := s.repository.All()
+	users, err := s.userRepository.All()
 	return users, err
 }
 
@@ -45,25 +48,30 @@ func (s *userService) Create(form_user model.FormUser) (bool, error) {
 
 	}
 	// Mapping FormUser to DB User
-	user := model.Users{
-		Username:      form_user.Username,
-		DisplayName:   form_user.DisplayName,
-		DisplayImgUrl: form_user.DisplayImgUrl,
-		Email:         form_user.Email,
-		Password:      string(hash_pass[:]),
-	}
-	_, err := s.repository.Create(&user)
+	user := s.MapFormUserToUsers(form_user, hash_pass)
+	_, err := s.userRepository.Create(&user)
 	return true, err
 }
 
 func (s *userService) Get(id int) (model.Users, error) {
-	user, err := s.repository.Get(id)
+	user, err := s.userRepository.Get(id)
 	return user, err
+}
+
+func (s *userService) GetPublic(id int) (model.PublicUser, error) {
+	user, err := s.userRepository.Get(id)
+	public_user := s.MapUserToPublicUser(user)
+	return public_user, err
+}
+
+func (s *userService) GetTicketsList(userId int, page int, limit int) (model.Pagination[model.Tickets], error) {
+	events_pagination, err := s.ticketRepository.ListByUserId(userId, page, limit)
+	return events_pagination, err
 }
 
 func (s *userService) Delete(id int) (bool, error) {
 	user := model.Users{Id: id}
-	_, err := s.repository.Delete(&user)
+	_, err := s.userRepository.Delete(&user)
 	if err != nil {
 		return true, err
 	}
@@ -74,7 +82,7 @@ func (s *userService) Update(id int, user model.Users) (bool, error) {
 	user.Id = id
 	now := time.Now()
 	user.UpdatedAt = &now
-	_, err := s.repository.Update(&user)
+	_, err := s.userRepository.Update(&user)
 	if err != nil {
 		return true, err
 	}
@@ -82,6 +90,30 @@ func (s *userService) Update(id int, user model.Users) (bool, error) {
 }
 
 func (s *userService) IsUsernameExist(username string) (bool, error) {
-	result, err := s.repository.IsExist("username", username)
+	result, err := s.userRepository.IsExist("username", username)
 	return result, err
+}
+
+func (s *userService) MapUserToPublicUser(user model.Users) model.PublicUser {
+	public_user := model.PublicUser{
+		Id:            user.Id,
+		Username:      user.Username,
+		DisplayName:   user.DisplayName,
+		DisplayImgUrl: user.DisplayImgUrl,
+		Email:         user.Email,
+		CreatedAt:     user.CreatedAt,
+		UpdatedAt:     user.UpdatedAt,
+	}
+	return public_user
+}
+
+func (s *userService) MapFormUserToUsers(form_user model.FormUser, hash_pass []byte) model.Users {
+	user := model.Users{
+		Username:      form_user.Username,
+		DisplayName:   form_user.DisplayName,
+		DisplayImgUrl: form_user.DisplayImgUrl,
+		Email:         form_user.Email,
+		Password:      string(hash_pass[:]),
+	}
+	return user
 }

@@ -41,6 +41,14 @@ func (s *ticketAdapter) Get(id int) (model.Tickets, error) {
 	return ticket, result.Error
 }
 
+func (s *ticketAdapter) ListByUserId(userId int, page int, limit int) (model.Pagination[model.Tickets], error) {
+	var tickets *[]model.Tickets
+	pagination := model.Pagination[model.Tickets]{Page: page, Limit: limit}
+	result := s.DB.Scopes(Paginate(tickets, &pagination, s.DB)).Find(&tickets, "owner_id = ?", userId)
+	pagination.List = *tickets
+	return pagination, result.Error
+}
+
 func (s *ticketAdapter) Update(ticket *model.Tickets) (bool, error) {
 	result := s.DB.Model(ticket).Updates(ticket)
 	return true, result.Error

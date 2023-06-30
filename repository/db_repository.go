@@ -24,6 +24,7 @@ type TicketRepository interface {
 	Create(tickets *model.Tickets) (model.Tickets, error)
 	CreateMultiple(ticketsList *[]model.Tickets, batchSize int) ([]model.Tickets, error)
 	Get(id int) (model.Tickets, error)
+	ListByUserId(userId int, page int, limit int) (model.Pagination[model.Tickets], error)
 	Update(ticket *model.Tickets) (bool, error)
 	Delete(ticket *model.Tickets) (bool, error)
 	Count(ticket *model.Tickets) (int64, error)

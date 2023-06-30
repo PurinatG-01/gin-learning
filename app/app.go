@@ -14,6 +14,7 @@ type ApplicationContext struct {
 	Auth    *handler.AuthHandler
 	Event   *handler.EventHandler
 	Ticket  *handler.TicketHandler
+	User    *handler.UserHandler
 	Health  *handler.HealthHandler
 	Utility *handler.UtilityHandler
 	DB      *gorm.DB
@@ -36,7 +37,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 
 	// #2 Init Services
 	// #2.1 Init authen/jwt/user services
-	userService := service.NewUserService(userRepository)
+	userService := service.NewUserService(userRepository, ticketRepository)
 	jwtService := service.NewJWTService()
 	loginService := service.NewLoginService(userRepository)
 	// #2.2 Init ticket service
@@ -51,6 +52,8 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	ticketHandler := handler.NewTicketHandler(ticketService)
 	// #3.3 Init event handler
 	eventHandler := handler.NewEventHandler(eventService)
+	// #3.4 Init user handler
+	userHandler := handler.NewUserHandler(userService)
 	// #3.4 Init utility handler
 	utilityHandler := handler.NewUtilityHandler()
 	// #3.5 Init health handler
@@ -60,6 +63,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 		Auth:    authHandler,
 		Event:   eventHandler,
 		Ticket:  ticketHandler,
+		User:    userHandler,
 		Health:  healthHandler,
 		Utility: utilityHandler,
 		DB:      db,

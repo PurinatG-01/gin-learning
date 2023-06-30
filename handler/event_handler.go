@@ -13,11 +13,12 @@ import (
 type EventHandler struct {
 	service   service.EventService
 	responder utils.Responder
+	paginator utils.Paginator
 }
 
 func NewEventHandler(service service.EventService) *EventHandler {
 
-	return &EventHandler{service: service, responder: utils.Responder{}}
+	return &EventHandler{service: service, responder: utils.Responder{}, paginator: utils.Paginator{}}
 }
 
 func (s *EventHandler) All(c *gin.Context) {
@@ -32,30 +33,12 @@ func (s *EventHandler) All(c *gin.Context) {
 }
 
 func (s *EventHandler) List(c *gin.Context) {
-	str_page := c.Query("page")
-	str_limit := c.Query("limit")
-	var page, limit int
-	if str_page == "" {
-		page = 1
-	} else {
-		conv_page, page_err := strconv.Atoi(str_page)
-		page = conv_page
-		if page_err != nil {
-			s.responder.ResponseError(c, page_err.Error())
-			return
-		}
+	paginator_err := s.paginator.Bind(c)
+	if paginator_err != nil {
+		s.responder.ResponseError(c, paginator_err.Error())
+		return
 	}
-	if str_limit == "" {
-		limit = 10
-	} else {
-		conv_limit, limit_err := strconv.Atoi(str_limit)
-		limit = conv_limit
-		if limit_err != nil {
-			s.responder.ResponseError(c, limit_err.Error())
-			return
-		}
-	}
-	events, list_err := s.service.List(page, limit)
+	events, list_err := s.service.List(s.paginator.Page, s.paginator.Limit)
 	if list_err != nil {
 		s.responder.ResponseError(c, list_err.Error())
 		return
