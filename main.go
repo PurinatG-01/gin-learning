@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"gin-learning/app"
+	_ "gin-learning/docs"
 	"gin-learning/log"
 	"gin-learning/middleware"
 
@@ -11,6 +12,19 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title Gin-learning-event API
+// @version 1.0
+// @description.markdown
+
+// @contact.name API Support
+// @contact.url https://github.com/PurinatG-01
+// @contact.email purinat.san@gmail.com
+
+// @schemes https http
+
+// @securityDefinitions.apikey JWT
+// @in header
+// @name Authorization
 func main() {
 	godotenv.Load(".env")
 	logger := log.InitLog(log.Logger{Name: "LOG #1"})

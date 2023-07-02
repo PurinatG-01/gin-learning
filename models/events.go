@@ -12,7 +12,6 @@ type Events struct {
 	CreatedAt    *time.Time `gorm:"created_at" json:"createdAt"`
 	UpdatedAt    *time.Time `gorm:"updated_at" json:"updatedAt"`
 	TotalTickets int        `gorm:"total_tickets" json:"totalTickets"`
-	// AvailableTickets *int       `gorm:"available_tickets" json:"availableTickets"`
 	TicketPrice int `gorm:"ticket_price" json:"ticketPrice"`
 }
 
@@ -23,6 +22,5 @@ type FormEvent struct {
 	EndedAt          *time.Time `form:"endedAt"`
 	ReleasedAt       *time.Time `form:"releasedAt"`
 	TotalTickets     int        `form:"totalTickets"`
-	AvailableTickets int        `form:"availableTickets"`
 	TicketPrice      int        `form:"ticketPrice"`
 }

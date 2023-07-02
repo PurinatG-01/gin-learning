@@ -1,0 +1,465 @@
+{
+    "schemes": [
+        "https",
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "# Gin-learning for Event ticket platform\n__By Purinat Sanbundit__",
+        "title": "Gin-learning-event API",
+        "contact": {
+            "name": "API Support",
+            "url": "https://github.com/PurinatG-01",
+            "email": "purinat.san@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/event": {
+            "get": {
+                "description": "All event",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Events"
+                ],
+                "summary": "All Events",
+                "operationId": "EventAllHandler",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Create event",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Create Event",
+                "operationId": "EventCreateHandler",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "description",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "endedAt",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "releasedAt",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "startedAt",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "ticketPrice",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "totalTickets",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/event/list": {
+            "get": {
+                "description": "List event by pagination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Events"
+                ],
+                "summary": "List Events",
+                "operationId": "EventListHandler",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page of the list",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit of the list",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/event/{id}": {
+            "get": {
+                "description": "Get event by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Get Event",
+                "operationId": "EventGetHandler",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Event ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Health checking for the service",
+                "produces": [
+                    "text/html"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Health Check",
+                "operationId": "HealthServerCheckHandler",
+                "responses": {}
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Login and retreiving JWT token",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "operationId": "AuthLoginHandler",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "password",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "username",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/signup": {
+            "post": {
+                "description": "Sign up for creating user",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "operationId": "AuthSignupHandler",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "displayImgUrl",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "displayName",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "email",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "password",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "username",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/ticket/purchase": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Purchasing ticket from event id",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ticket"
+                ],
+                "operationId": "TicketPurchaseHandler",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "name": "amount",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "eventId",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/tickets": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Get user's ticket by user id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "operationId": "UserTicketsHandler",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page of the list",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit of the list",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{id}": {
+            "get": {
+                "description": "Get public info user by user id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "operationId": "UserGetPublicHandler",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/utility/random": {
+            "get": {
+                "description": "Random items in accepting list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Utility"
+                ],
+                "operationId": "UtiltyRandomHandler",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "list of items to random in comma separated string formatted, example `1,2.3,4,5` ",
+                        "name": "list",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ApiResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "utils.ApiResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "additionalProperties": {}
+                },
+                "error": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "JWT": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

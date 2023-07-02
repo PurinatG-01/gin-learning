@@ -1,0 +1,303 @@
+definitions:
+  utils.ApiResponse:
+    properties:
+      data:
+        additionalProperties: {}
+        type: object
+      error:
+        type: string
+      status:
+        type: integer
+    type: object
+info:
+  contact:
+    email: purinat.san@gmail.com
+    name: API Support
+    url: https://github.com/PurinatG-01
+  description: |-
+    # Gin-learning for Event ticket platform
+    __By Purinat Sanbundit__
+  title: Gin-learning-event API
+  version: "1.0"
+paths:
+  /event:
+    get:
+      description: All event
+      operationId: EventAllHandler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      summary: All Events
+      tags:
+      - Events
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create event
+      operationId: EventCreateHandler
+      parameters:
+      - in: formData
+        name: description
+        type: string
+      - in: formData
+        name: endedAt
+        type: string
+      - in: formData
+        name: releasedAt
+        type: string
+      - in: formData
+        name: startedAt
+        type: string
+      - in: formData
+        name: ticketPrice
+        type: integer
+      - in: formData
+        name: title
+        type: string
+      - in: formData
+        name: totalTickets
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      security:
+      - JWT: []
+      summary: Create Event
+      tags:
+      - Events
+  /event/{id}:
+    get:
+      description: Get event by id
+      operationId: EventGetHandler
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      summary: Get Event
+      tags:
+      - Events
+  /event/list:
+    get:
+      description: List event by pagination
+      operationId: EventListHandler
+      parameters:
+      - description: page of the list
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: limit of the list
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      summary: List Events
+      tags:
+      - Events
+  /health:
+    get:
+      description: Health checking for the service
+      operationId: HealthServerCheckHandler
+      produces:
+      - text/html
+      responses: {}
+      summary: Health Check
+      tags:
+      - Health
+  /login:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Login and retreiving JWT token
+      operationId: AuthLoginHandler
+      parameters:
+      - in: formData
+        name: password
+        type: string
+      - in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      tags:
+      - Auth
+  /signup:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Sign up for creating user
+      operationId: AuthSignupHandler
+      parameters:
+      - in: formData
+        name: displayImgUrl
+        type: string
+      - in: formData
+        name: displayName
+        type: string
+      - in: formData
+        name: email
+        type: string
+      - in: formData
+        name: password
+        type: string
+      - in: formData
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      tags:
+      - Auth
+  /ticket/purchase:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Purchasing ticket from event id
+      operationId: TicketPurchaseHandler
+      parameters:
+      - in: formData
+        name: amount
+        required: true
+        type: integer
+      - in: formData
+        name: eventId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      security:
+      - JWT: []
+      tags:
+      - Ticket
+  /user/{id}:
+    get:
+      description: Get public info user by user id
+      operationId: UserGetPublicHandler
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      tags:
+      - User
+  /user/tickets:
+    get:
+      description: Get user's ticket by user id
+      operationId: UserTicketsHandler
+      parameters:
+      - description: page of the list
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: limit of the list
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      security:
+      - JWT: []
+      tags:
+      - User
+  /utility/random:
+    get:
+      description: Random items in accepting list
+      operationId: UtiltyRandomHandler
+      parameters:
+      - description: 'list of items to random in comma separated string formatted,
+          example `1,2.3,4,5` '
+        in: query
+        name: list
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      tags:
+      - Utility
+schemes:
+- https
+- http
+securityDefinitions:
+  JWT:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
