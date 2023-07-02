@@ -46,6 +46,18 @@ func (s *TicketHandler) Create(c *gin.Context) {
 	return
 }
 
+// TicketPurchase godoc
+// @description Purchasing ticket from event id
+// @tags Ticket
+// @id TicketPurchaseHandler
+// @security JWT
+// @accept mpfd
+// @produce json
+// @param body formData model.FormTicket true "Form ticket for purchasing ticket, including `eventId` and `amount`"
+// @response 200 {object} utils.ApiResponse
+// @response 401 {object} utils.ApiResponse
+// @response 500 {object} utils.ApiResponse
+// @Router /ticket/purchase [post]
 func (s *TicketHandler) Purchase(c *gin.Context) {
 	// #1 Get userId, eventId
 	str_userId := c.GetString("x-user-id")

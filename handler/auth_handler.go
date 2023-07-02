@@ -19,6 +19,16 @@ func NewAuthHandler(loginService service.LoginService, jwtService service.JWTSer
 	return &AuthHandler{loginService: loginService, jwtService: jwtService, userService: userService, responder: utils.Responder{}}
 }
 
+// LoginAuth godoc
+// @description Login and retreiving JWT token
+// @tags Auth
+// @id AuthLoginHandler
+// @accept mpfd
+// @produce json
+// @param body formData model.LoginCredentials true "User data for login including `username` and `password`"
+// @response 200 {object} utils.ApiResponse
+// @response 401 {object} utils.ApiResponse
+// @Router /login [post]
 func (s *AuthHandler) Login(c *gin.Context) {
 	var credential model.LoginCredentials
 	bind_err := c.ShouldBind(&credential)
@@ -40,6 +50,15 @@ func (s *AuthHandler) Logout(c *gin.Context) {
 	return
 }
 
+// SignupAuth godoc
+// @description Sign up for creating user
+// @tags Auth
+// @id AuthSignupHandler
+// @accept mpfd
+// @produce json
+// @param body formData model.FormUser true "User data to be create"
+// @response 200 {object} utils.ApiResponse
+// @Router /signup [post]
 func (s *AuthHandler) Signup(c *gin.Context) {
 	var form_user model.FormUser
 	bind_err := c.ShouldBind(&form_user)

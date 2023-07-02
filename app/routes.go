@@ -3,17 +3,17 @@ package app
 import (
 	"context"
 	"gin-learning/middleware"
-	"net/http"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
 )
 
 func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext) {
 
-	// GET routes
-	engine.GET("/", landing)
-	engine.GET("/ping", ping)
-	engine.GET("/test", test)
+	// Swagger
+	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Authntication routes
 	engine.POST("/login", app.Auth.Login)
@@ -34,13 +34,12 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 
 	ticket := engine.Group("/ticket")
 	{
-		ticket.GET("/", app.Ticket.All)
-		ticket.Use().Use().POST("/purchase", middleware.UserAuthorizeJWT(), middleware.DBTransactionMiddleware(app.DB), app.Ticket.Purchase)
-		ticket.POST("/", app.Ticket.Create)
-		ticket.GET("/:id", app.Ticket.Get)
-		ticket.DELETE("/:id", app.Ticket.Delete)
-		ticket.PUT("/:id", app.Ticket.Update)
-
+		// ticket.GET("/", app.Ticket.All)
+		ticket.POST("/purchase", middleware.UserAuthorizeJWT(), middleware.DBTransactionMiddleware(app.DB), app.Ticket.Purchase)
+		// ticket.POST("/", app.Ticket.Create)
+		// ticket.GET("/:id", app.Ticket.Get)
+		// ticket.DELETE("/:id", app.Ticket.Delete)
+		// ticket.PUT("/:id", app.Ticket.Update)
 	}
 
 	user := engine.Group("/user")
@@ -54,24 +53,7 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 
 	utility := engine.Group("/utility")
 	{
-		utility.GET("/shuffle", app.Utility.Shuffle)
+		utility.GET("/random", app.Utility.Random)
 	}
 
-}
-
-func ping(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "pong",
-	})
-}
-
-func landing(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"title": "Gin-learning",
-	})
-}
-
-func test(c *gin.Context) {
-	data := map[string]any{"msg": "🚀 Yeahhh", "list": []int{1, 2, 3, 4, 5}}
-	c.JSON(http.StatusOK, &data)
 }

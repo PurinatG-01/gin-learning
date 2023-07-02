@@ -21,6 +21,14 @@ func NewEventHandler(service service.EventService) *EventHandler {
 	return &EventHandler{service: service, responder: utils.Responder{}, paginator: utils.Paginator{}}
 }
 
+// AllEvent godoc
+// @summary All Events
+// @description All event
+// @tags Events
+// @id EventAllHandler
+// @produce json
+// @response 200 {object} utils.ApiResponse
+// @Router /event [get]
 func (s *EventHandler) All(c *gin.Context) {
 	events, err := s.service.All()
 	if err != nil {
@@ -32,6 +40,16 @@ func (s *EventHandler) All(c *gin.Context) {
 	return
 }
 
+// ListEvent godoc
+// @summary List Events
+// @description List event by pagination
+// @tags Events
+// @id EventListHandler
+// @produce json
+// @param page query int true "page of the list"
+// @param limit query int true "limit of the list"
+// @response 200 {object} utils.ApiResponse
+// @Router /event/list [get]
 func (s *EventHandler) List(c *gin.Context) {
 	paginator_err := s.paginator.Bind(c)
 	if paginator_err != nil {
@@ -50,6 +68,17 @@ func (s *EventHandler) List(c *gin.Context) {
 	return
 }
 
+// CreateEvent godoc
+// @summary Create Event
+// @description Create event
+// @security JWT
+// @tags Events
+// @id EventCreateHandler
+// @accept mpfd
+// @produce json
+// @param body formData model.FormEvent true "Event data to be create"
+// @response 201 {object} utils.ApiResponse
+// @Router /event [post]
 func (s *EventHandler) Create(c *gin.Context) {
 	userId, conv_err := strconv.Atoi(c.GetString("x-user-id"))
 	if conv_err != nil {
@@ -75,6 +104,15 @@ func (s *EventHandler) Create(c *gin.Context) {
 	return
 }
 
+// GetEvent godoc
+// @summary Get Event
+// @description Get event by id
+// @tags Events
+// @id EventGetHandler
+// @produce json
+// @param id path int true "Event ID"
+// @response 200 {object} utils.ApiResponse
+// @Router /event/{id}  [get]
 func (s *EventHandler) Get(c *gin.Context) {
 	param_id := c.Param("id")
 	id, param_err := strconv.Atoi(param_id)

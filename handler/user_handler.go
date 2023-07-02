@@ -20,6 +20,15 @@ func NewUserHandler(service service.UserService) *UserHandler {
 	return &UserHandler{service: service, responder: utils.Responder{}, paginator: utils.Paginator{}}
 }
 
+// UserGetPublic godoc
+// @description Get public info user by user id
+// @tags User
+// @id UserGetPublicHandler
+// @produce json
+// @param id path int true "User ID"
+// @response 200 {object} utils.ApiResponse
+// @response 400 {object} utils.ApiResponse
+// @Router /user/{id} [get]
 func (s *UserHandler) GetPublic(c *gin.Context) {
 	param_id := c.Param("id")
 	id, param_err := strconv.Atoi(param_id)
@@ -39,6 +48,17 @@ func (s *UserHandler) GetPublic(c *gin.Context) {
 	return
 }
 
+// UserTickets godoc
+// @description Get user's ticket by user id
+// @tags User
+// @id UserTicketsHandler
+// @security JWT
+// @produce json
+// @param page query int true "page of the list"
+// @param limit query int true "limit of the list"
+// @response 200 {object} utils.ApiResponse
+// @response 400 {object} utils.ApiResponse
+// @Router /user/tickets [get]
 func (s *UserHandler) Tickets(c *gin.Context) {
 	str_user_id := c.GetString("x-user-id")
 	user_id, param_err := strconv.Atoi(str_user_id)
