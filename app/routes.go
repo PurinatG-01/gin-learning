@@ -42,9 +42,14 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 		// ticket.PUT("/:id", app.Ticket.Update)
 	}
 
-	purchase := engine.Group("/purchase", middleware.UserAuthorizeJWT())
+	payment := engine.Group("/payment")
 	{
-		purchase.POST("/ticket", app.Purchase.PurchaseTicket)
+		payment.GET("/channel", app.Purchase.AllPaymentMethod)
+		payment.POST("/hooks", app.Purchase.Test)
+		purchase := payment.Group("/purchase", middleware.UserAuthorizeJWT())
+		{
+			purchase.POST("/ticket", app.Purchase.PurchaseTicket)
+		}
 	}
 
 	user := engine.Group("/user")
