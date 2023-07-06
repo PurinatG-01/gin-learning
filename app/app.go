@@ -2,10 +2,10 @@ package app
 
 import (
 	"context"
+	"gin-learning/config"
 	"gin-learning/handler"
 	"gin-learning/repository"
 	"gin-learning/service"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -29,7 +29,10 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	if db_err != nil {
 		panic(db_err)
 	}
-	http_client := &http.Client{}
+	payment_config, pc_err := config.NewPaymentConfig()
+	if pc_err != nil {
+		panic(pc_err)
+	}
 
 	// #1 Init Repositories
 	userRepository := repository.NewUserRepository(db)
@@ -48,7 +51,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	// #2.3 Init event service
 	eventService := service.NewEventService(eventRepository, userRepository, ticketRepository)
 	// #2.4 Init payment service
-	paymentService := service.NewPaymentService(http_client)
+	paymentService := service.NewPaymentService(payment_config)
 
 	// #3 Init handler/controller
 	// #3.1 Init auth handler

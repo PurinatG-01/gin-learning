@@ -35,3 +35,29 @@ func (s *PurchaseHandler) PurchaseTicket(c *gin.Context) {
 	s.responder.ResponseSuccess(c, &map[string]interface{}{"acknowledged": true})
 	return
 }
+
+func (s *PurchaseHandler) AllPaymentMethod(c *gin.Context) {
+	payment_methods, err := s.paymentService.GetPaymentConfig()
+	if err != nil {
+		s.responder.ResponseError(c, err.Error())
+		return
+	}
+	data := map[string]interface{}{"list": payment_methods}
+	s.responder.ResponseSuccess(c, &data)
+	return
+}
+
+func (s *PurchaseHandler) Test(c *gin.Context) {
+	var data map[string]interface{}
+	if err := c.BindJSON(&data); err != nil {
+		s.responder.ResponseError(c, err.Error())
+		return
+	}
+	// pretty.Print("----------- \n")
+	// pretty.Print(c.Request.Header)
+	// pretty.Print("----------- \n")
+
+	// pretty.Print(data)
+	s.responder.ResponseSuccess(c, &data)
+	return
+}
