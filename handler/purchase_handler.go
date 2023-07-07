@@ -47,6 +47,13 @@ func (s *PurchaseHandler) AllPaymentMethod(c *gin.Context) {
 	return
 }
 
+func (s *PurchaseHandler) TestCharge(c *gin.Context) {
+	charge, charge_err := s.paymentService.CreatePromptpaySource(10000)
+	data := map[string]interface{}{"charge": charge, "charge_err": charge_err}
+	s.responder.ResponseSuccess(c, &data)
+	return
+}
+
 func (s *PurchaseHandler) Test(c *gin.Context) {
 	var data map[string]interface{}
 	if err := c.BindJSON(&data); err != nil {
