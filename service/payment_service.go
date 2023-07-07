@@ -12,7 +12,7 @@ import (
 type PaymentService interface {
 	PurchaseByPromptpay() (interface{}, error)
 	GetPaymentConfig() (*[]config.PaymentMethod, error)
-	CreatePromptpaySource(amount int) (*omise.Source, error)
+	CreatePromptpayCharge(amount int) (*omise.Charge, error)
 }
 
 func NewPaymentService(config *config.PaymentConfig) PaymentService {
@@ -47,16 +47,23 @@ func (s *paymentService) GetPaymentConfig() (*[]config.PaymentMethod, error) {
 	return &s.config.PaymentMethodList, nil
 }
 
-func (s *paymentService) CreatePromptpaySource(amount int) (*omise.Source, error) {
-
+func (s *paymentService) CreatePromptpayCharge(amount int) (*omise.Charge, error) {
+	map_amount := int64(amount * 100)
 	source, createSource := &omise.Source{}, &operations.CreateSource{
-		Amount:   int64(amount),
+		Amount:   map_amount,
 		Currency: "thb",
 		Type:     "promptpay",
 	}
 	if e := s.omiseClient.Do(source, createSource); e != nil {
 		panic(e)
 	}
-
-	return source, nil
+	charge, createCharge := &omise.Charge{}, &operations.CreateCharge{
+		Amount:   map_amount,
+		Currency: "thb",
+		Source:   source.ID,
+	}
+	if e := s.omiseClient.Do(charge, createCharge); e != nil {
+		panic(e)
+	}
+	return charge, nil
 }

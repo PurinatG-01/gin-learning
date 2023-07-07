@@ -6,7 +6,6 @@ import (
 	"gin-learning/utils"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kr/pretty"
 )
 
 type PurchaseHandler struct {
@@ -30,8 +29,6 @@ func (s *PurchaseHandler) PurchaseTicket(c *gin.Context) {
 		return
 	}
 
-	pretty.Print(form_payment)
-
 	s.responder.ResponseSuccess(c, &map[string]interface{}{"acknowledged": true})
 	return
 }
@@ -48,8 +45,8 @@ func (s *PurchaseHandler) AllPaymentMethod(c *gin.Context) {
 }
 
 func (s *PurchaseHandler) TestCharge(c *gin.Context) {
-	charge, charge_err := s.paymentService.CreatePromptpaySource(10000)
-	data := map[string]interface{}{"charge": charge, "charge_err": charge_err}
+	charge, charge_err := s.paymentService.CreatePromptpayCharge(525)
+	data := map[string]interface{}{"charge_err": charge_err, "charge": charge}
 	s.responder.ResponseSuccess(c, &data)
 	return
 }
