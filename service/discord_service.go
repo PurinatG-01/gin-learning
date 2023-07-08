@@ -17,9 +17,9 @@ type DiscordService interface {
 }
 
 func NewDiscordService() DiscordService {
-	url := fmt.Sprintf(os.Getenv("DISCORD_WEBHOOK_URL"))
+	url := fmt.Sprintf(os.Getenv("DISCORD_HOOK_URL"))
 	if url == "" {
-		panic("DISCORD_WEBHOOK_URL is not set")
+		panic("DISCORD_HOOK_URL is not set")
 	}
 	app_env := fmt.Sprintf(os.Getenv("APP_ENV"))
 	if app_env == "" {
@@ -31,6 +31,40 @@ func NewDiscordService() DiscordService {
 type discordService struct {
 	HookUrl    string
 	SenderName string
+}
+
+func (s *discordService) MapTransactionStatusColor(status string) int {
+	switch status {
+	case "pending":
+		return 16776960
+	case "success":
+		return 3066993
+	case "failed":
+		return 15158332
+	case "reversed":
+		return 15158332
+	case "expired":
+		return 15158332
+	default:
+		return 0
+	}
+}
+
+func (s *discordService) MapTransactionStatusIcon(status string) string {
+	switch status {
+	case "pending":
+		return "⏳"
+	case "success":
+		return "✅"
+	case "failed":
+		return "❌"
+	case "reversed":
+		return "🔁"
+	case "expired":
+		return "⏰"
+	default:
+		return ""
+	}
 }
 
 func (s *discordService) SendTransactionMessage(transactionId string, amount int, purchaserId int, eventId int, status string) error {
@@ -59,7 +93,7 @@ func (s *discordService) SendTransactionMessage(transactionId string, amount int
 	footer := sender.Footer{
 		Text: "Ticket Transaction",
 	}
-	send_err := s.SendEmbedMessage("Transaction", 15277667, fields, footer)
+	send_err := s.SendEmbedMessage(fmt.Sprintf("[Transaction: %v%v]", s.MapTransactionStatusIcon(status), status), s.MapTransactionStatusColor(status), fields, footer)
 	if send_err != nil {
 		return send_err
 	}

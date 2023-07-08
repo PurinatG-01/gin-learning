@@ -10,7 +10,6 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/kr/pretty"
 	"github.com/omise/omise-go"
 	"github.com/omise/omise-go/operations"
 )
@@ -97,10 +96,6 @@ func (s *paymentService) PurchaseTicket(form_payment model.FormTicketPayment, us
 		ticket_transaction.Id = uuid.New().String()
 		ticket_transaction_list = append(ticket_transaction_list, ticket_transaction)
 	}
-
-	pretty.Print("\n\n")
-	pretty.Print(ticket_transaction_list)
-	pretty.Print("\n\n")
 	_, ticket_transaction_err := s.ticketTransactionRepository.CreateMultiple(&ticket_transaction_list, 20)
 	if ticket_transaction_err != nil {
 		return nil, ticket_transaction_err

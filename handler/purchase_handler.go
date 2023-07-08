@@ -12,13 +12,15 @@ import (
 type PurchaseHandler struct {
 	paymentService service.PaymentService
 	ticketService  service.TicketService
+	discordService service.DiscordService
 	responder      utils.Responder
 }
 
-func NewPurchaseHandler(paymentService service.PaymentService, ticketService service.TicketService) *PurchaseHandler {
+func NewPurchaseHandler(paymentService service.PaymentService, ticketService service.TicketService, discordService service.DiscordService) *PurchaseHandler {
 	return &PurchaseHandler{
 		paymentService: paymentService,
 		ticketService:  ticketService,
+		discordService: discordService,
 		responder:      utils.Responder{},
 	}
 }
@@ -45,6 +47,7 @@ func (s *PurchaseHandler) PurchaseTicket(c *gin.Context) {
 		s.responder.ResponseError(c, charge_err.Error())
 		return
 	}
+	s.discordService.SendTransactionMessage(charge.ID, form_payment.Amount, user_id, form_payment.EventId, model.OMISE_CHARGE_STATUS_PENDING)
 	s.responder.ResponseSuccess(c, &map[string]interface{}{"charge": charge})
 	return
 }

@@ -42,6 +42,8 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	usersAccessRepository := repository.NewUsersAccessRepository(db)
 
 	// #2 Init Services
+	// #2.0 Helper services
+	discordService := service.NewDiscordService()
 	// #2.1 Init authen/jwt/user services
 	userService := service.NewUserService(userRepository, ticketRepository)
 	jwtService := service.NewJWTService()
@@ -67,7 +69,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	// #3.5 Init health handler
 	healthHandler := handler.NewHealthHandler()
 	// 3.6 Init Purchase handler
-	purchaseHandler := handler.NewPurchaseHandler(paymentService, ticketService)
+	purchaseHandler := handler.NewPurchaseHandler(paymentService, ticketService, discordService)
 
 	return &ApplicationContext{
 		Auth:     authHandler,
