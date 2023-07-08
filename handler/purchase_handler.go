@@ -4,6 +4,7 @@ import (
 	model "gin-learning/models"
 	"gin-learning/service"
 	"gin-learning/utils"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,13 +24,28 @@ func NewPurchaseHandler(paymentService service.PaymentService, ticketService ser
 }
 
 func (s *PurchaseHandler) PurchaseTicket(c *gin.Context) {
+	str_userId := c.GetString("x-user-id")
+	user_id, conv_err := strconv.Atoi(str_userId)
+	if conv_err != nil {
+		s.responder.ResponseError(c, conv_err.Error())
+		return
+	}
 	var form_payment model.FormTicketPayment
 	if err := c.ShouldBind(&form_payment); err != nil {
 		s.responder.ResponseError(c, err.Error())
 		return
 	}
+	if ql_err := s.paymentService.CheckPurchaseTicketQualification(form_payment); ql_err != nil {
+		s.responder.ResponseError(c, ql_err.Error())
+		return
+	}
 
-	s.responder.ResponseSuccess(c, &map[string]interface{}{"acknowledged": true})
+	charge, charge_err := s.paymentService.PurchaseTicket(form_payment, user_id)
+	if charge_err != nil {
+		s.responder.ResponseError(c, charge_err.Error())
+		return
+	}
+	s.responder.ResponseSuccess(c, &map[string]interface{}{"charge": charge})
 	return
 }
 
@@ -44,14 +60,7 @@ func (s *PurchaseHandler) AllPaymentMethod(c *gin.Context) {
 	return
 }
 
-func (s *PurchaseHandler) TestCharge(c *gin.Context) {
-	charge, charge_err := s.paymentService.CreatePromptpayCharge(525)
-	data := map[string]interface{}{"charge_err": charge_err, "charge": charge}
-	s.responder.ResponseSuccess(c, &data)
-	return
-}
-
-func (s *PurchaseHandler) Test(c *gin.Context) {
+func (s *PurchaseHandler) OmiseHook(c *gin.Context) {
 	var data map[string]interface{}
 	if err := c.BindJSON(&data); err != nil {
 		s.responder.ResponseError(c, err.Error())

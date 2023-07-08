@@ -51,7 +51,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	// #2.3 Init event service
 	eventService := service.NewEventService(eventRepository, userRepository, ticketRepository)
 	// #2.4 Init payment service
-	paymentService := service.NewPaymentService(payment_config)
+	paymentService := service.NewPaymentService(eventRepository, ticketRepository, ticketTransactionRepository, payment_config)
 
 	// #3 Init handler/controller
 	// #3.1 Init auth handler
