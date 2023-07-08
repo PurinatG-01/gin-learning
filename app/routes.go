@@ -45,8 +45,8 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 	payment := engine.Group("/payment")
 	{
 		payment.GET("/channel", app.Purchase.AllPaymentMethod)
-		payment.POST("/hooks", app.Purchase.Test)
-		purchase := payment.Group("/purchase", middleware.UserAuthorizeJWT())
+		payment.POST("/hooks", app.Purchase.OmiseHook)
+		purchase := payment.Group("/purchase", middleware.UserAuthorizeJWT(), middleware.DBTransactionMiddleware(app.DB))
 		{
 			purchase.POST("/ticket", app.Purchase.PurchaseTicket)
 		}

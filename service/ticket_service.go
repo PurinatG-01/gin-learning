@@ -113,7 +113,7 @@ func (s *ticketService) Purchase(form_ticket model.FormTicket, userId int) (mode
 	ticket_transaction_list := []model.TicketsTransaction{}
 	for i := 0; i < form_ticket.Amount; i++ {
 		ticket_transaction.Id = uuid.New().String()
-		ticket_transaction.TicketId = ticket_list[i].Id
+		ticket_transaction.TicketId = &ticket_list[i].Id
 		ticket_transaction_list = append(ticket_transaction_list, ticket_transaction)
 	}
 	_, ticket_transaction_err := s.ticketTransactionRepository.CreateMultiple(&ticket_transaction_list, 20)
