@@ -128,3 +128,8 @@ func (s *paymentService) CreatePromptpayCharge(charge *omise.Charge, amount int)
 func (s *paymentService) GetPaymentConfig() (*[]config.PaymentMethod, error) {
 	return &s.config.PaymentMethodList, nil
 }
+
+func (s *paymentService) ResolvePaymentCharge(charge *omise.Charge) error {
+
+	return nil
+}

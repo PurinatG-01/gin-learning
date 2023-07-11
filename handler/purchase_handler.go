@@ -1,12 +1,15 @@
 package handler
 
 import (
+	"errors"
 	model "gin-learning/models"
 	"gin-learning/service"
 	"gin-learning/utils"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kr/pretty"
+	"github.com/omise/omise-go"
 )
 
 type PurchaseHandler struct {
@@ -64,16 +67,13 @@ func (s *PurchaseHandler) AllPaymentMethod(c *gin.Context) {
 }
 
 func (s *PurchaseHandler) OmiseHook(c *gin.Context) {
-	var data map[string]interface{}
-	if err := c.BindJSON(&data); err != nil {
-		s.responder.ResponseError(c, err.Error())
+	event, exists := c.Get("omise-event")
+	if !exists {
+		s.responder.ResponseError(c, errors.New("event not found").Error())
 		return
 	}
-	// pretty.Print("----------- \n")
-	// pretty.Print(c.Request.Header)
-	// pretty.Print("----------- \n")
-
-	// pretty.Print(data)
-	s.responder.ResponseSuccess(c, &data)
+	event_data := event.(*omise.Event)
+	pretty.Print(event_data)
+	s.responder.ResponseSuccess(c, &map[string]interface{}{"data": event_data})
 	return
 }
