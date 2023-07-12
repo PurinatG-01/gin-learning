@@ -58,5 +58,8 @@ type TicketTransactionRepository interface {
 	// Get(id string) (model.TicketsTransaction, error)
 	Create(ticketTransaction *model.TicketsTransaction) (model.TicketsTransaction, error)
 	CreateMultiple(ticketsList *[]model.TicketsTransaction, batchSize int) ([]model.TicketsTransaction, error)
+	Get(id int) (model.TicketsTransaction, error)
+	GetByKey(key string, value string) (model.TicketsTransaction, error)
+	Count(transaction *model.TicketsTransaction) (int64, error)
 	WithTrx(trxHandle *gorm.DB) TicketTransactionRepository
 }

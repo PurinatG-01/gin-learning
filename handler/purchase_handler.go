@@ -74,6 +74,10 @@ func (s *PurchaseHandler) OmiseHook(c *gin.Context) {
 	}
 	event_data := event.(*omise.Event)
 	pretty.Print(event_data)
+	if event_data.Key == "charge.complete" {
+		charge := event_data.Data.(*omise.Charge)
+		s.paymentService.ResolvePaymentChargeComplete(charge)
+	}
 	s.responder.ResponseSuccess(c, &map[string]interface{}{"data": event_data})
 	return
 }
