@@ -19,6 +19,7 @@ type PaymentService interface {
 	GetPaymentConfig() (*[]config.PaymentMethod, error)
 	CreatePromptpayCharge(charge *omise.Charge, amount int) error
 	CheckPurchaseTicketQualification(form_payment model.FormTicketPayment) error
+	ResolvePaymentChargeComplete(charge *omise.Charge) error
 }
 
 func NewPaymentService(eventRepository repository.EventRepository, ticketRepository repository.TicketRepository, ticketTransactionRepository repository.TicketTransactionRepository, config *config.PaymentConfig) PaymentService {
@@ -127,4 +128,22 @@ func (s *paymentService) CreatePromptpayCharge(charge *omise.Charge, amount int)
 
 func (s *paymentService) GetPaymentConfig() (*[]config.PaymentMethod, error) {
 	return &s.config.PaymentMethodList, nil
+}
+
+func (s *paymentService) ValidateCharge(charge *omise.Charge) (*model.TicketsTransaction, error) {
+	transaction, transaction_err := s.ticketTransactionRepository.GetByKey("transaction_id", charge.ID)
+	if transaction_err != nil {
+		return nil, errors.New("Transaction not found")
+	}
+	return &transaction, nil
+}
+
+func (s *paymentService) ResolvePaymentChargeComplete(charge *omise.Charge) error {
+	// #0 Validate charge id
+	// transaction := model.TicketsTransaction{TransactionId: charge.ID}
+	_, transaction_err := s.ValidateCharge(charge)
+	if transaction_err != nil {
+		return transaction_err
+	}
+	return nil
 }

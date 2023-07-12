@@ -7,7 +7,6 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.5.1
-	github.com/kr/pretty v0.3.1
 	github.com/omise/omise-go v1.0.9
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
@@ -15,6 +14,11 @@ require (
 	golang.org/x/crypto v0.11.0
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.2
+)
+
+require (
+	github.com/kr/pretty v0.3.1
+	github.com/kr/text v0.2.0 // indirect
 )
 
 require (
@@ -40,7 +44,6 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.5 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect

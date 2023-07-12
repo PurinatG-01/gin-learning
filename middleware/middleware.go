@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
+	"github.com/omise/omise-go"
 	"gorm.io/gorm"
 )
 
@@ -89,4 +90,18 @@ func DBTransactionMiddleware(db *gorm.DB) gin.HandlerFunc {
 			txHandle.Rollback()
 		}
 	}
+}
+
+func OmiseMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		omise.WebhookHTTPHandler(&OmiseEventHandler{context: c}).ServeHTTP(c.Writer, c.Request)
+	}
+}
+
+type OmiseEventHandler struct {
+	context *gin.Context
+}
+
+func (s *OmiseEventHandler) HandleEvent(w http.ResponseWriter, r *http.Request, event *omise.Event) {
+	s.context.Set("omise-event", event)
 }
