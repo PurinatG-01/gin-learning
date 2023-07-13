@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/kr/pretty"
 	"github.com/omise/omise-go"
 )
 
@@ -73,10 +72,13 @@ func (s *PurchaseHandler) OmiseHook(c *gin.Context) {
 		return
 	}
 	event_data := event.(*omise.Event)
-	pretty.Print(event_data)
 	if event_data.Key == "charge.complete" {
 		charge := event_data.Data.(*omise.Charge)
-		s.paymentService.ResolvePaymentChargeComplete(charge)
+		resolve_err := s.paymentService.ResolvePaymentChargeComplete(charge)
+		if resolve_err != nil {
+			s.responder.ResponseError(c, resolve_err.Error())
+			return
+		}
 	}
 	s.responder.ResponseSuccess(c, &map[string]interface{}{"data": event_data})
 	return
