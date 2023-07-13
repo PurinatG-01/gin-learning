@@ -22,8 +22,8 @@ type PaymentService interface {
 	ResolvePaymentChargeComplete(charge *omise.Charge) error
 }
 
-func NewPaymentService(eventRepository repository.EventRepository, ticketRepository repository.TicketRepository, ticketTransactionRepository repository.TicketTransactionRepository, config *config.PaymentConfig) PaymentService {
-	service := &paymentService{config: config, eventRepository: eventRepository, ticketRepository: ticketRepository, ticketTransactionRepository: ticketTransactionRepository}
+func NewPaymentService(eventRepository repository.EventRepository, ticketRepository repository.TicketRepository, ticketTransactionRepository repository.TicketTransactionRepository, usersAccessRepository repository.UsersAccessRepository, config *config.PaymentConfig) PaymentService {
+	service := &paymentService{config: config, eventRepository: eventRepository, ticketRepository: ticketRepository, ticketTransactionRepository: ticketTransactionRepository, usersAccessRepository: usersAccessRepository}
 	service.omiseClient = service.initOmiseClient(config.OmiseConfig.PublicKey, config.OmiseConfig.SecretKey)
 	return service
 }
@@ -35,6 +35,7 @@ type paymentService struct {
 	eventRepository             repository.EventRepository
 	ticketRepository            repository.TicketRepository
 	ticketTransactionRepository repository.TicketTransactionRepository
+	usersAccessRepository       repository.UsersAccessRepository
 }
 
 func (s *paymentService) initOmiseClient(pk string, sk string) *omise.Client {
@@ -76,6 +77,19 @@ func (s *paymentService) PurchaseTicket(form_payment model.FormTicketPayment, us
 	if event_err != nil {
 		return nil, event_err
 	}
+	// #0.1 Get total concurrent transactions on specific charge id (transaction id) (eventID, status = pending, status = successful)
+	total_concurrent_transactions, count_err := s.ticketTransactionRepository.CountMultiple([]model.TicketsTransaction{
+		{EventId: event.Id, Status: model.OMISE_CHARGE_STATUS_PENDING},
+		{EventId: event.Id, Status: model.OMISE_CHARGE_STATUS_SUCCESSFUL},
+	})
+	if count_err != nil {
+		return nil, count_err
+	}
+	// #0.2 Check if concurrent transactions sun with request amount exceed total tickets
+	if total_concurrent_transactions+int64(form_payment.Amount) > int64(event.TotalTickets) {
+		return nil, errors.New("Out of ticket")
+	}
+
 	// #1 Prepare omise charge
 	var purchase_err error
 	omise_charge := &omise.Charge{}
@@ -140,10 +154,43 @@ func (s *paymentService) ValidateCharge(charge *omise.Charge) (*model.TicketsTra
 
 func (s *paymentService) ResolvePaymentChargeComplete(charge *omise.Charge) error {
 	// #0 Validate charge id
-	// transaction := model.TicketsTransaction{TransactionId: charge.ID}
-	_, transaction_err := s.ValidateCharge(charge)
+	transaction, transaction_err := s.ValidateCharge(charge)
 	if transaction_err != nil {
 		return transaction_err
+	}
+	tr_count, tr_count_err := s.ticketTransactionRepository.Count(&model.TicketsTransaction{TransactionId: charge.ID})
+	if tr_count_err != nil {
+		return tr_count_err
+	}
+	// #1 Update ticket transaction status to complete
+	_, u_t_err := s.ticketTransactionRepository.UpdateByKey("transaction_id", transaction.Id, "status", model.OMISE_CHARGE_STATUS_SUCCESSFUL)
+	if u_t_err != nil {
+		return u_t_err
+	}
+	// #2 Create ticket
+	ticket := model.Tickets{
+		EventId: transaction.EventId,
+		OwnerId: transaction.PurchaserId,
+	}
+	ticket_list := []model.Tickets{}
+	for i := 0; i < int(tr_count); i++ {
+		ticket.Id = uuid.New().String()
+		ticket_list = append(ticket_list, ticket)
+	}
+	ticket_list, cr_t_err := s.ticketRepository.CreateMultiple(&ticket_list, 20)
+	if cr_t_err != nil {
+		return cr_t_err
+	}
+	// #3 Create Users access
+	users_access := model.UsersAccess{UserId: transaction.PurchaserId, EventId: transaction.EventId}
+	users_access_list := []model.UsersAccess{}
+	for i := 0; i < int(tr_count); i++ {
+		users_access.TicketId = ticket_list[i].Id
+		users_access_list = append(users_access_list, users_access)
+	}
+	_, users_access_err := s.usersAccessRepository.CreateMultiple(&users_access_list, 20)
+	if users_access_err != nil {
+		return users_access_err
 	}
 	return nil
 }

@@ -42,6 +42,12 @@ func (s *ticketTransactionAdapter) Count(transaction *model.TicketsTransaction) 
 	return count, result.Error
 }
 
+func (s *ticketTransactionAdapter) CountMultiple(list []model.TicketsTransaction) (int64, error) {
+	var count int64
+	result := s.DB.Model(&model.TicketsTransaction{}).Where(list).Count(&count)
+	return count, result.Error
+}
+
 func (s *ticketTransactionAdapter) GetByKey(key string, value string) (model.TicketsTransaction, error) {
 	var transaction model.TicketsTransaction
 	result := s.DB.Where(fmt.Sprintf("%s = ?", key), value).First(&transaction)
@@ -51,6 +57,11 @@ func (s *ticketTransactionAdapter) GetByKey(key string, value string) (model.Tic
 		return transaction, result.Error
 	}
 	return transaction, nil
+}
+
+func (s *ticketTransactionAdapter) UpdateByKey(fkey string, fvalue any, skey string, svalue any) (bool, error) {
+	result := s.DB.Model(&model.TicketsTransaction{}).Where(fmt.Sprintf("%s = ?", fkey), fvalue).Updates(map[string]interface{}{skey: svalue})
+	return true, result.Error
 }
 
 // WithTrx enables repository with transaction
