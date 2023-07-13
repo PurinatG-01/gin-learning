@@ -57,14 +57,16 @@ func (s *paymentService) CheckPurchaseTicketQualification(form_payment model.For
 	if event_err != nil {
 		return event_err
 	}
-	// #1.1.2 Check event available tickets by counting from tickets
-	ticket_count, ticket_count_err := s.ticketRepository.Count(&model.Tickets{EventId: event.Id})
-	if ticket_count_err != nil {
-		return ticket_count_err
+	// #1.1.2 Get total concurrent transactions on specific charge id (transaction id) (eventID, status = pending, status = successful)
+	total_concurrent_transactions, count_err := s.ticketTransactionRepository.CountMultiple([]model.TicketsTransaction{
+		{EventId: event.Id, Status: model.OMISE_CHARGE_STATUS_PENDING},
+		{EventId: event.Id, Status: model.OMISE_CHARGE_STATUS_SUCCESSFUL},
+	})
+	if count_err != nil {
+		return count_err
 	}
-	available_tickets := int(int64(event.TotalTickets) - ticket_count)
-	// #1.1.3 Out of ticket => error
-	if available_tickets < form_payment.Amount {
+	// #1.1.3 Check if concurrent transactions sun with request amount exceed total tickets
+	if total_concurrent_transactions+int64(form_payment.Amount) > int64(event.TotalTickets) {
 		return errors.New("Out of ticket")
 	}
 	// #1.2 Success => continue
@@ -76,18 +78,6 @@ func (s *paymentService) PurchaseTicket(form_payment model.FormTicketPayment, us
 	event, event_err := s.eventRepository.Get(form_payment.EventId)
 	if event_err != nil {
 		return nil, event_err
-	}
-	// #0.1 Get total concurrent transactions on specific charge id (transaction id) (eventID, status = pending, status = successful)
-	total_concurrent_transactions, count_err := s.ticketTransactionRepository.CountMultiple([]model.TicketsTransaction{
-		{EventId: event.Id, Status: model.OMISE_CHARGE_STATUS_PENDING},
-		{EventId: event.Id, Status: model.OMISE_CHARGE_STATUS_SUCCESSFUL},
-	})
-	if count_err != nil {
-		return nil, count_err
-	}
-	// #0.2 Check if concurrent transactions sun with request amount exceed total tickets
-	if total_concurrent_transactions+int64(form_payment.Amount) > int64(event.TotalTickets) {
-		return nil, errors.New("Out of ticket")
 	}
 
 	// #1 Prepare omise charge
@@ -145,8 +135,8 @@ func (s *paymentService) GetPaymentConfig() (*[]config.PaymentMethod, error) {
 }
 
 func (s *paymentService) ValidateCharge(charge *omise.Charge) (*model.TicketsTransaction, error) {
-	transaction, transaction_err := s.ticketTransactionRepository.GetByKey("transaction_id", charge.ID)
-	if transaction_err != nil {
+	transaction, transaction_err, count := s.ticketTransactionRepository.GetByKey("transaction_id", charge.Base.ID)
+	if transaction_err != nil || count == 0 {
 		return nil, errors.New("Transaction not found")
 	}
 	return &transaction, nil
@@ -158,12 +148,12 @@ func (s *paymentService) ResolvePaymentChargeComplete(charge *omise.Charge) erro
 	if transaction_err != nil {
 		return transaction_err
 	}
-	tr_count, tr_count_err := s.ticketTransactionRepository.Count(&model.TicketsTransaction{TransactionId: charge.ID})
+	tr_count, tr_count_err := s.ticketTransactionRepository.Count(&model.TicketsTransaction{TransactionId: charge.Base.ID})
 	if tr_count_err != nil {
 		return tr_count_err
 	}
 	// #1 Update ticket transaction status to complete
-	_, u_t_err := s.ticketTransactionRepository.UpdateByKey("transaction_id", transaction.Id, "status", model.OMISE_CHARGE_STATUS_SUCCESSFUL)
+	_, u_t_err := s.ticketTransactionRepository.UpdateByKey("transaction_id", transaction.TransactionId, "status", model.OMISE_CHARGE_STATUS_SUCCESSFUL)
 	if u_t_err != nil {
 		return u_t_err
 	}

@@ -44,19 +44,19 @@ func (s *ticketTransactionAdapter) Count(transaction *model.TicketsTransaction) 
 
 func (s *ticketTransactionAdapter) CountMultiple(list []model.TicketsTransaction) (int64, error) {
 	var count int64
-	result := s.DB.Model(&model.TicketsTransaction{}).Where(list).Count(&count)
+	result := s.DB.Model(list).Count(&count)
 	return count, result.Error
 }
 
-func (s *ticketTransactionAdapter) GetByKey(key string, value string) (model.TicketsTransaction, error) {
+func (s *ticketTransactionAdapter) GetByKey(key string, value string) (model.TicketsTransaction, error, int) {
 	var transaction model.TicketsTransaction
 	result := s.DB.Where(fmt.Sprintf("%s = ?", key), value).First(&transaction)
 	if result.RowsAffected != 1 {
-		return transaction, errors.New(fmt.Sprintf("%s : %s found more than 1 (rows affeceted more than 1)", key, value))
+		return transaction, errors.New(fmt.Sprintf("%s : %s found more than 1 (rows affeceted more than 1)", key, value)), int(result.RowsAffected)
 	} else if result.Error != nil {
-		return transaction, result.Error
+		return transaction, result.Error, int(result.RowsAffected)
 	}
-	return transaction, nil
+	return transaction, nil, int(result.RowsAffected)
 }
 
 func (s *ticketTransactionAdapter) UpdateByKey(fkey string, fvalue any, skey string, svalue any) (bool, error) {
