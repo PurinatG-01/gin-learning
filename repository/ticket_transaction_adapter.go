@@ -48,6 +48,12 @@ func (s *ticketTransactionAdapter) CountMultiple(list []model.TicketsTransaction
 	return count, result.Error
 }
 
+func (s *ticketTransactionAdapter) CountFromEventIdAndStatus(eventId int, statusList []string) (int64, error) {
+	var count int64
+	result := s.DB.Model(&model.TicketsTransaction{}).Where("event_id = ? AND status IN ?", eventId, statusList).Count(&count)
+	return count, result.Error
+}
+
 func (s *ticketTransactionAdapter) GetByKey(key string, value string) (model.TicketsTransaction, error, int) {
 	var transaction model.TicketsTransaction
 	result := s.DB.Where(fmt.Sprintf("%s = ?", key), value).First(&transaction)

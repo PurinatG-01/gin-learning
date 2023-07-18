@@ -49,7 +49,6 @@ func (s *PurchaseHandler) PurchaseTicket(c *gin.Context) {
 		s.responder.ResponseError(c, charge_err.Error())
 		return
 	}
-	s.discordService.SendTransactionMessage(charge.ID, form_payment.Amount, user_id, form_payment.EventId, model.OMISE_CHARGE_STATUS_PENDING)
 	s.responder.ResponseSuccess(c, &map[string]interface{}{"charge": charge})
 	return
 }
@@ -74,11 +73,24 @@ func (s *PurchaseHandler) OmiseHook(c *gin.Context) {
 	event_data := event.(*omise.Event)
 	if event_data.Key == "charge.complete" {
 		charge := event_data.Data.(*omise.Charge)
-		resolve_err := s.paymentService.ResolvePaymentChargeComplete(charge)
-		if resolve_err != nil {
-			s.responder.ResponseError(c, resolve_err.Error())
-			return
+		if charge.Status == model.OMISE_CHARGE_STATUS_SUCCESSFUL {
+			resolve_err := s.paymentService.ResolvePaymentChargeComplete(charge)
+			if resolve_err != nil {
+				s.responder.ResponseError(c, resolve_err.Error())
+				return
+			}
+			s.discordService.SendTransactionMessage(charge.ID, int(charge.Amount), string(model.OMISE_CHARGE_STATUS_SUCCESSFUL))
+		} else if charge.Status == model.OMISE_CHARGE_STATUS_FAILED {
+			resolve_err := s.paymentService.ResolvePaymentChargeFailed(charge)
+			if resolve_err != nil {
+				s.responder.ResponseError(c, resolve_err.Error())
+				return
+			}
+			s.discordService.SendTransactionMessage(charge.ID, int(charge.Amount), string(model.OMISE_CHARGE_STATUS_FAILED))
 		}
+	} else if event_data.Key == "charge.create" {
+		charge := event_data.Data.(*omise.Charge)
+		s.discordService.SendTransactionMessage(charge.ID, int(charge.Amount), string(model.OMISE_CHARGE_STATUS_PENDING))
 	}
 	s.responder.ResponseSuccess(c, &map[string]interface{}{"data": event_data})
 	return

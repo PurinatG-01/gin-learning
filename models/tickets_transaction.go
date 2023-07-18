@@ -4,15 +4,20 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/omise/omise-go"
 	"gorm.io/gorm"
 )
 
+type OmiseChargeStatus = omise.ChargeStatus
+
 const (
-	OMISE_CHARGE_STATUS_PENDING    = "pending"
-	OMISE_CHARGE_STATUS_FAILED     = "failed"
-	OMISE_CHARGE_STATUS_SUCCESSFUL = "successful"
-	OMISE_CHARGE_STATUS_REVERSED   = "reversed"
-	OMISE_CHARFE_STATUS_EXPIRED    = "expired"
+	OMISE_CURRENCY_RATE_TH                           = 100
+	OMISE_CHARGE_SCOPE             omise.SearchScope = omise.ChargeScope
+	OMISE_CHARGE_STATUS_PENDING    OmiseChargeStatus = omise.ChargePending
+	OMISE_CHARGE_STATUS_FAILED     OmiseChargeStatus = omise.ChargeFailed
+	OMISE_CHARGE_STATUS_SUCCESSFUL OmiseChargeStatus = omise.ChargeSuccessful
+	OMISE_CHARGE_STATUS_REVERSED   OmiseChargeStatus = omise.ChargeReversed
+	OMISE_CHARGE_STATUS_EXPIRED    string            = "expired"
 )
 
 type TicketsTransaction struct {
