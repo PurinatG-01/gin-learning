@@ -63,5 +63,6 @@ type TicketTransactionRepository interface {
 	UpdateByKey(fkey string, fvalue any, skey string, svalue any) (bool, error)
 	Count(transaction *model.TicketsTransaction) (int64, error)
 	CountMultiple(list []model.TicketsTransaction) (int64, error)
+	CountFromEventIdAndStatus(eventId int, statusList []string) (int64, error)
 	WithTrx(trxHandle *gorm.DB) TicketTransactionRepository
 }

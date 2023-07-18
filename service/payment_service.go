@@ -20,6 +20,7 @@ type PaymentService interface {
 	CreatePromptpayCharge(charge *omise.Charge, amount int) error
 	CheckPurchaseTicketQualification(form_payment model.FormTicketPayment) error
 	ResolvePaymentChargeComplete(charge *omise.Charge) error
+	ResolvePaymentChargeFailed(charge *omise.Charge) error
 }
 
 func NewPaymentService(eventRepository repository.EventRepository, ticketRepository repository.TicketRepository, ticketTransactionRepository repository.TicketTransactionRepository, usersAccessRepository repository.UsersAccessRepository, config *config.PaymentConfig) PaymentService {
@@ -58,10 +59,8 @@ func (s *paymentService) CheckPurchaseTicketQualification(form_payment model.For
 		return event_err
 	}
 	// #1.1.2 Get total concurrent transactions on specific charge id (transaction id) (eventID, status = pending, status = successful)
-	total_concurrent_transactions, count_err := s.ticketTransactionRepository.CountMultiple([]model.TicketsTransaction{
-		{EventId: event.Id, Status: model.OMISE_CHARGE_STATUS_PENDING},
-		{EventId: event.Id, Status: model.OMISE_CHARGE_STATUS_SUCCESSFUL},
-	})
+	total_concurrent_transactions, count_err := s.ticketTransactionRepository.CountFromEventIdAndStatus(event.Id, []string{
+		string(model.OMISE_CHARGE_STATUS_PENDING), string(model.OMISE_CHARGE_STATUS_SUCCESSFUL)})
 	if count_err != nil {
 		return count_err
 	}
@@ -95,7 +94,7 @@ func (s *paymentService) PurchaseTicket(form_payment model.FormTicketPayment, us
 	}
 
 	// #2 Create ticket transaction with status pending along with charge ID
-	ticket_transaction := model.TicketsTransaction{TicketId: nil, TransactionId: omise_charge.ID, PurchaserId: user_id, EventId: form_payment.EventId, Status: model.OMISE_CHARGE_STATUS_PENDING}
+	ticket_transaction := model.TicketsTransaction{TicketId: nil, TransactionId: omise_charge.ID, PurchaserId: user_id, EventId: form_payment.EventId, Status: string(model.OMISE_CHARGE_STATUS_PENDING)}
 	ticket_transaction_list := []model.TicketsTransaction{}
 	for i := 0; i < form_payment.Amount; i++ {
 		ticket_transaction.Id = uuid.New().String()
@@ -110,7 +109,7 @@ func (s *paymentService) PurchaseTicket(form_payment model.FormTicketPayment, us
 }
 
 func (s *paymentService) CreatePromptpayCharge(charge *omise.Charge, amount int) error {
-	map_amount := int64(amount * 100)
+	map_amount := int64(amount * model.OMISE_CURRENCY_RATE_TH)
 	source, createSource := &omise.Source{}, &operations.CreateSource{
 		Amount:   map_amount,
 		Currency: "thb",
@@ -148,6 +147,7 @@ func (s *paymentService) ResolvePaymentChargeComplete(charge *omise.Charge) erro
 	if transaction_err != nil {
 		return transaction_err
 	}
+	// #0.1 Get total transactions from transaction id
 	tr_count, tr_count_err := s.ticketTransactionRepository.Count(&model.TicketsTransaction{TransactionId: charge.Base.ID})
 	if tr_count_err != nil {
 		return tr_count_err
@@ -181,6 +181,20 @@ func (s *paymentService) ResolvePaymentChargeComplete(charge *omise.Charge) erro
 	_, users_access_err := s.usersAccessRepository.CreateMultiple(&users_access_list, 20)
 	if users_access_err != nil {
 		return users_access_err
+	}
+	return nil
+}
+
+func (s *paymentService) ResolvePaymentChargeFailed(charge *omise.Charge) error {
+	// #0 Validate charge id
+	transaction, transaction_err := s.ValidateCharge(charge)
+	if transaction_err != nil {
+		return transaction_err
+	}
+	// #1 Update ticket transaction status to failed
+	_, u_transactions_err := s.ticketTransactionRepository.UpdateByKey("transaction_id", transaction.TransactionId, "status", model.OMISE_CHARGE_STATUS_FAILED)
+	if u_transactions_err != nil {
+		return u_transactions_err
 	}
 	return nil
 }

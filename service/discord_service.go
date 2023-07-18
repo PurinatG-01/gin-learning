@@ -3,6 +3,7 @@ package service
 import (
 	"encoding/json"
 	"fmt"
+	model "gin-learning/models"
 	"os"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 )
 
 type DiscordService interface {
-	SendTransactionMessage(transactionId string, amount int, purchaserId int, eventId int, status string) error
+	SendTransactionMessage(transactionId string, amount int, status string) error
 	SendEmbedMessage(title string, color int, fields []sender.Field, footer sender.Footer) error
 	CreateEmbed(title string, color int, fields []sender.Field, footer sender.Footer) *sender.Embed
 	SendMessage(embeds sender.Embed) error
@@ -35,15 +36,15 @@ type discordService struct {
 
 func (s *discordService) MapTransactionStatusColor(status string) int {
 	switch status {
-	case "pending":
+	case string(model.OMISE_CHARGE_STATUS_PENDING):
 		return 16776960
-	case "success":
+	case string(model.OMISE_CHARGE_STATUS_SUCCESSFUL):
 		return 3066993
-	case "failed":
+	case string(model.OMISE_CHARGE_STATUS_FAILED):
 		return 15158332
-	case "reversed":
+	case string(model.OMISE_CHARGE_STATUS_REVERSED):
 		return 15158332
-	case "expired":
+	case model.OMISE_CHARGE_STATUS_EXPIRED:
 		return 15158332
 	default:
 		return 0
@@ -52,22 +53,22 @@ func (s *discordService) MapTransactionStatusColor(status string) int {
 
 func (s *discordService) MapTransactionStatusIcon(status string) string {
 	switch status {
-	case "pending":
+	case string(model.OMISE_CHARGE_STATUS_PENDING):
 		return "⏳"
-	case "success":
+	case string(model.OMISE_CHARGE_STATUS_SUCCESSFUL):
 		return "✅"
-	case "failed":
+	case string(model.OMISE_CHARGE_STATUS_FAILED):
 		return "❌"
-	case "reversed":
+	case string(model.OMISE_CHARGE_STATUS_REVERSED):
 		return "🔁"
-	case "expired":
+	case model.OMISE_CHARGE_STATUS_EXPIRED:
 		return "⏰"
 	default:
 		return ""
 	}
 }
 
-func (s *discordService) SendTransactionMessage(transactionId string, amount int, purchaserId int, eventId int, status string) error {
+func (s *discordService) SendTransactionMessage(transactionId string, amount int, status string) error {
 	fields := []sender.Field{
 		{
 			Name:   "Transaction ID",
@@ -76,17 +77,7 @@ func (s *discordService) SendTransactionMessage(transactionId string, amount int
 		},
 		{
 			Name:   "Amount",
-			Value:  fmt.Sprintf("%v", amount),
-			Inline: true,
-		},
-		{
-			Name:   "Purchaser ID",
-			Value:  fmt.Sprintf("%d", purchaserId),
-			Inline: true,
-		},
-		{
-			Name:   "Event ID",
-			Value:  fmt.Sprintf("%d", eventId),
+			Value:  fmt.Sprintf("%v", amount/model.OMISE_CURRENCY_RATE_TH),
 			Inline: true,
 		},
 	}
@@ -124,7 +115,6 @@ func (s *discordService) SendMessage(embeds sender.Embed) error {
 	hook := sender.Hook{
 		Username:   s.SenderName,
 		Avatar_url: "https://avatars.githubusercontent.com/u/6016509?s=48&v=4",
-		Content:    "Message",
 		Embeds:     []sender.Embed{embeds},
 	}
 	payload, err := json.Marshal(hook)
