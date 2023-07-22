@@ -14,19 +14,19 @@ type UserService interface {
 	Create(user model.FormUser) (bool, error)
 	Get(id int) (model.Users, error)
 	GetPublic(id int) (model.PublicUser, error)
-	GetTicketsList(userId int, page int, limit int) (model.Pagination[model.Tickets], error)
+	GetTicketsList(userId int, page int, limit int) (model.Pagination[model.UsersAccess], error)
 	Delete(id int) (bool, error)
 	Update(id int, user model.Users) (bool, error)
 	IsUsernameExist(username string) (bool, error)
 }
 
-func NewUserService(userRepository repository.UserRepository, ticketRepository repository.TicketRepository) UserService {
-	return &userService{userRepository: userRepository, ticketRepository: ticketRepository}
+func NewUserService(userRepository repository.UserRepository, usersAccessRepository repository.UsersAccessRepository) UserService {
+	return &userService{userRepository: userRepository, usersAccessRepository: usersAccessRepository}
 }
 
 type userService struct {
-	userRepository   repository.UserRepository
-	ticketRepository repository.TicketRepository
+	userRepository        repository.UserRepository
+	usersAccessRepository repository.UsersAccessRepository
 }
 
 func (s *userService) All() (*[]model.Users, error) {
@@ -64,8 +64,8 @@ func (s *userService) GetPublic(id int) (model.PublicUser, error) {
 	return public_user, err
 }
 
-func (s *userService) GetTicketsList(userId int, page int, limit int) (model.Pagination[model.Tickets], error) {
-	events_pagination, err := s.ticketRepository.ListByUserId(userId, page, limit)
+func (s *userService) GetTicketsList(userId int, page int, limit int) (model.Pagination[model.UsersAccess], error) {
+	events_pagination, err := s.usersAccessRepository.ListByUserId(userId, page, limit)
 	return events_pagination, err
 }
 

@@ -41,6 +41,14 @@ func (s *usersAccessAdapter) Get(id int) (model.UsersAccess, error) {
 	return users_access, result.Error
 }
 
+func (s *usersAccessAdapter) ListByUserId(userId int, page int, limit int) (model.Pagination[model.UsersAccess], error) {
+	var users_access_list *[]model.UsersAccess
+	pagination := model.Pagination[model.UsersAccess]{Page: page, Limit: limit}
+	result := s.DB.Scopes(Paginate(users_access_list, &pagination, s.DB)).Preload("Event").Find(&users_access_list, "user_id = ?", userId)
+	pagination.List = *users_access_list
+	return pagination, result.Error
+}
+
 func (s *usersAccessAdapter) Update(users_access *model.UsersAccess) (bool, error) {
 	result := s.DB.Model(users_access).Updates(users_access)
 	return true, result.Error

@@ -36,6 +36,7 @@ type UsersAccessRepository interface {
 	Create(tickets *model.UsersAccess) (model.UsersAccess, error)
 	CreateMultiple(users_access *[]model.UsersAccess, batchSize int) (bool, error)
 	Get(id int) (model.UsersAccess, error)
+	ListByUserId(userId int, page int, limit int) (model.Pagination[model.UsersAccess], error)
 	Update(ticket *model.UsersAccess) (bool, error)
 	Delete(ticket *model.UsersAccess) (bool, error)
 	WithTrx(trxHandle *gorm.DB) UsersAccessRepository
