@@ -46,7 +46,7 @@ func (s *TicketHandler) Create(c *gin.Context) {
 	return
 }
 
-// TicketPurchase godoc
+// OldTicketPurchase godoc
 // @description Purchasing ticket from event id
 // @tags Ticket
 // @id TicketPurchaseHandler
