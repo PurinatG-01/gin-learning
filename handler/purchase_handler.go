@@ -27,6 +27,18 @@ func NewPurchaseHandler(paymentService service.PaymentService, ticketService ser
 	}
 }
 
+// TicketPurchase godoc
+// @description Purchasing ticket from event id and amount
+// @tags Purchase
+// @id PurchaseTicketHandler
+// @security JWT
+// @accept mpfd
+// @produce json
+// @param body formData model.FormTicketPayment true "Form ticket for purchasing ticket, including `eventId`, `amount`, and `channel`"
+// @response 200 {object} utils.ApiResponse
+// @response 401 {object} utils.ApiResponse
+// @response 500 {object} utils.ApiResponse
+// @Router /payment/purchase/ticket [post]
 func (s *PurchaseHandler) PurchaseTicket(c *gin.Context) {
 	str_userId := c.GetString("x-user-id")
 	user_id, conv_err := strconv.Atoi(str_userId)
@@ -64,6 +76,14 @@ func (s *PurchaseHandler) AllPaymentMethod(c *gin.Context) {
 	return
 }
 
+// OmiseWebhook godoc
+// @description Webhook for omise event
+// @tags Purchase
+// @id OmiseHookHandler
+// @produce json
+// @response 200 {object} utils.ApiResponse
+// @response 500 {object} utils.ApiResponse
+// @Router /payment/callback [post]
 func (s *PurchaseHandler) OmiseHook(c *gin.Context) {
 	event, exists := c.Get("omise-event")
 	if !exists {

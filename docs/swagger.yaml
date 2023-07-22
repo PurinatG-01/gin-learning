@@ -154,6 +154,61 @@ paths:
             $ref: '#/definitions/utils.ApiResponse'
       tags:
       - Auth
+  /payment/callback:
+    post:
+      description: Webhook for omise event
+      operationId: OmiseHookHandler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      tags:
+      - Purchase
+  /payment/purchase/ticket:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Purchasing ticket from event id and amount
+      operationId: PurchaseTicketHandler
+      parameters:
+      - in: formData
+        name: amount
+        required: true
+        type: integer
+      - in: formData
+        name: channel
+        required: true
+        type: string
+      - in: formData
+        name: eventId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      security:
+      - JWT: []
+      tags:
+      - Purchase
   /signup:
     post:
       consumes:
