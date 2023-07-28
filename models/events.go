@@ -12,15 +12,17 @@ type Events struct {
 	CreatedAt    *time.Time `gorm:"created_at" json:"createdAt"`
 	UpdatedAt    *time.Time `gorm:"updated_at" json:"updatedAt"`
 	TotalTickets int        `gorm:"total_tickets" json:"totalTickets"`
-	TicketPrice int `gorm:"ticket_price" json:"ticketPrice"`
+	TicketPrice  int        `gorm:"ticket_price" json:"ticketPrice"`
+	Thumbnail    string     `gorm:"thumbnail" json:"thumbnail"`
 }
 
 type FormEvent struct {
-	Title            string     `form:"title"`
-	Description      string     `form:"description"`
-	StartedAt        *time.Time `form:"startedAt"`
-	EndedAt          *time.Time `form:"endedAt"`
-	ReleasedAt       *time.Time `form:"releasedAt"`
-	TotalTickets     int        `form:"totalTickets"`
-	TicketPrice      int        `form:"ticketPrice"`
+	Title        string     `form:"title"`
+	Description  string     `form:"description"`
+	StartedAt    *time.Time `form:"startedAt"`
+	EndedAt      *time.Time `form:"endedAt"`
+	ReleasedAt   *time.Time `form:"releasedAt"`
+	TotalTickets int        `form:"totalTickets"`
+	TicketPrice  int        `form:"ticketPrice"`
+	Thumbnail    string     `form:"thumbnail"`
 }
