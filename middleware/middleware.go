@@ -5,6 +5,7 @@ import (
 	"gin-learning/service"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/omise/omise-go"
@@ -17,7 +18,9 @@ func InitMiddlewares(engine *gin.Engine) {
 
 func CORSMiddlewares() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		allow_host := os.Getenv("APP_HOST")
+		log.Print("[HOST]", allow_host)
+		c.Writer.Header().Set("Access-Control-Allow-Origin", allow_host)
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
