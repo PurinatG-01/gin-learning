@@ -23,8 +23,10 @@ func CORSMiddlewares() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
 
+		// Handle pre-flight (OPTIONS) requests
 		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
+			// Respond with 200 status code (Success) for pre-flight requests
+			c.Writer.WriteHeader(http.StatusOK)
 			return
 		}
 		c.Next()
