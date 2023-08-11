@@ -71,5 +71,11 @@ func (s *AuthHandler) Signup(c *gin.Context) {
 		s.responder.ResponseError(c, create_err.Error())
 		return
 	}
-	s.responder.ResponseSuccess(c, &map[string]interface{}{"acknowledged": result})
+	user, login_err := s.loginService.LoginUser(form_user.Username, form_user.Password)
+	if login_err != nil {
+		s.responder.ResponseUnauthorized(c)
+		return
+	}
+	token := s.jwtService.GenerateToken(user)
+	s.responder.ResponseSuccess(c, &map[string]interface{}{"acknowledged": result, "token": token})
 }
