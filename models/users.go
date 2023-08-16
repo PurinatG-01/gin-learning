@@ -34,3 +34,9 @@ type FormUser struct {
 	Email         string `json:"email" form:"email"`
 	Password      string `json:"password" form:"password"`
 }
+
+type UpdateFormUser struct {
+	DisplayName   string `json:"displayName" form:"displayName"`
+	DisplayImgUrl string `json:"displayImgUrl" form:"displayImgUrl"`
+	Email         string `json:"email" form:"email"`
+}

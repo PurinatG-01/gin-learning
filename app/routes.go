@@ -28,18 +28,11 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 		event.GET("/list", app.Event.List)
 		event.GET("/:id", app.Event.Get)
 		event.Use(middleware.UserAuthorizeJWT()).POST("/", app.Event.Create)
-		// event.DELETE("/:id", app.Event.Delete)
-		// event.PUT("/:id", app.Event.Update)
 	}
 
 	ticket := engine.Group("/ticket")
 	{
-		// ticket.GET("/", app.Ticket.All)
 		ticket.POST("/purchase", middleware.UserAuthorizeJWT(), middleware.DBTransactionMiddleware(app.DB), app.Ticket.Purchase)
-		// ticket.POST("/", app.Ticket.Create)
-		// ticket.GET("/:id", app.Ticket.Get)
-		// ticket.DELETE("/:id", app.Ticket.Delete)
-		// ticket.PUT("/:id", app.Ticket.Update)
 	}
 
 	payment := engine.Group("/payment")
@@ -58,6 +51,7 @@ func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext
 		userAuthen := user.Use(middleware.UserAuthorizeJWT())
 		{
 			userAuthen.GET("/tickets", app.User.Tickets)
+			userAuthen.PUT("/update", app.User.Update)
 		}
 	}
 

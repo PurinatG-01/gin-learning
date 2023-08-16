@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	model "gin-learning/models"
 	"gin-learning/service"
 	"gin-learning/utils"
 	"strconv"
@@ -81,4 +82,25 @@ func (s *UserHandler) Tickets(c *gin.Context) {
 	_ = json.Unmarshal(marshal_event, &data)
 	s.responder.ResponseSuccess(c, &data)
 	return
+}
+
+func (s *UserHandler) Update(c *gin.Context) {
+	str_user_id := c.GetString("x-user-id")
+	user_id, param_err := strconv.Atoi(str_user_id)
+	if param_err != nil {
+		s.responder.ResponseError(c, param_err.Error())
+		return
+	}
+	form_user := model.UpdateFormUser{}
+	bind_err := c.ShouldBind(&form_user)
+	if bind_err != nil {
+		s.responder.ResponseError(c, bind_err.Error())
+		return
+	}
+	_, update_err := s.service.Update(user_id, form_user)
+	if update_err != nil {
+		s.responder.ResponseError(c, update_err.Error())
+		return
+	}
+	s.responder.ResponseUpdateSuccess(c)
 }
