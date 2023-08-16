@@ -84,6 +84,16 @@ func (s *UserHandler) Tickets(c *gin.Context) {
 	return
 }
 
+// UserTickets godoc
+// @description Update user basic info
+// @tags User
+// @id UserUpdateHandler
+// @security JWT
+// @produce json
+// @param body formData model.UpdateFormUser true "User data to be update"
+// @response 204 {object} utils.ApiResponse
+// @response 400 {object} utils.ApiResponse
+// @Router /user/tickets [get]
 func (s *UserHandler) Update(c *gin.Context) {
 	str_user_id := c.GetString("x-user-id")
 	user_id, param_err := strconv.Atoi(str_user_id)

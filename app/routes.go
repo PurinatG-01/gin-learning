@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"gin-learning/middleware"
 
 	swaggerFiles "github.com/swaggo/files"
@@ -10,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(ctx context.Context, engine *gin.Engine, app *ApplicationContext) {
+func InitRoutes(engine *gin.Engine, app *ApplicationContext) {
 
 	// Swagger
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

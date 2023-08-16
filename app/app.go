@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"gin-learning/config"
 	"gin-learning/handler"
 	"gin-learning/repository"
@@ -22,7 +21,7 @@ type ApplicationContext struct {
 	DB       *gorm.DB
 }
 
-func NewApp(ctx context.Context) (*ApplicationContext, error) {
+func NewApp() (*ApplicationContext, error) {
 
 	// #0 [Pre] Setup pre-requisite
 	db, db_err := repository.ConnectDatabase()
@@ -83,7 +82,7 @@ func NewApp(ctx context.Context) (*ApplicationContext, error) {
 	}, nil
 }
 
-func InitApp(ctx context.Context, engine *gin.Engine) {
-	app, _ := NewApp(ctx)
-	InitRoutes(ctx, engine, app)
+func InitApp(engine *gin.Engine) {
+	app, _ := NewApp()
+	InitRoutes(engine, app)
 }
