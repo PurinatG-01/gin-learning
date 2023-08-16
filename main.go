@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"gin-learning/app"
 	_ "gin-learning/docs"
@@ -31,11 +30,10 @@ func main() {
 	logger.Log("Sever opened ja")
 	engine := gin.Default()
 	engine.LoadHTMLGlob("templates/*")
-	ctx := context.Background()
 	// Set up cors middleware
 	middleware.InitMiddlewares(engine)
 	// Set up server routes
-	app.InitApp(ctx, engine)
+	app.InitApp(engine)
 
 	engine.Run(fmt.Sprintf(":8080")) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

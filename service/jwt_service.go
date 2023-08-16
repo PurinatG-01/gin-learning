@@ -66,7 +66,7 @@ func (s *jwtService) ValidateToken(token string) (*jwt.Token, error, jwt.MapClai
 	claims := jwt.MapClaims{}
 	jwtToken, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		if _, isValid := token.Method.(*jwt.SigningMethodHMAC); !isValid {
-			return nil, fmt.Errorf("Invalid token", token.Header["alg"])
+			return nil, fmt.Errorf("Invalid token : %v", token.Header["alg"])
 		}
 		return []byte(s.secretKey), nil
 	})
