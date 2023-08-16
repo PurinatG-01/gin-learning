@@ -53,6 +53,9 @@ paths:
         name: startedAt
         type: string
       - in: formData
+        name: thumbnail
+        type: string
+      - in: formData
         name: ticketPrice
         type: integer
       - in: formData
@@ -299,24 +302,23 @@ paths:
       - User
   /user/tickets:
     get:
-      description: Get user's ticket by user id
-      operationId: UserTicketsHandler
+      description: Update user basic info
+      operationId: UserUpdateHandler
       parameters:
-      - description: page of the list
-        in: query
-        name: page
-        required: true
-        type: integer
-      - description: limit of the list
-        in: query
-        name: limit
-        required: true
-        type: integer
+      - in: formData
+        name: displayImgUrl
+        type: string
+      - in: formData
+        name: displayName
+        type: string
+      - in: formData
+        name: email
+        type: string
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "204":
+          description: No Content
           schema:
             $ref: '#/definitions/utils.ApiResponse'
         "400":

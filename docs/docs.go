@@ -80,6 +80,11 @@ const docTemplate = `{
                         "in": "formData"
                     },
                     {
+                        "type": "string",
+                        "name": "thumbnail",
+                        "in": "formData"
+                    },
+                    {
                         "type": "integer",
                         "name": "ticketPrice",
                         "in": "formData"
@@ -424,33 +429,34 @@ const docTemplate = `{
                         "JWT": []
                     }
                 ],
-                "description": "Get user's ticket by user id",
+                "description": "Update user basic info",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "User"
                 ],
-                "operationId": "UserTicketsHandler",
+                "operationId": "UserUpdateHandler",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "page of the list",
-                        "name": "page",
-                        "in": "query",
-                        "required": true
+                        "type": "string",
+                        "name": "displayImgUrl",
+                        "in": "formData"
                     },
                     {
-                        "type": "integer",
-                        "description": "limit of the list",
-                        "name": "limit",
-                        "in": "query",
-                        "required": true
+                        "type": "string",
+                        "name": "displayName",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "email",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "204": {
+                        "description": "No Content",
                         "schema": {
                             "$ref": "#/definitions/utils.ApiResponse"
                         }
