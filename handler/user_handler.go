@@ -114,5 +114,5 @@ func (s *UserHandler) Update(c *gin.Context) {
 		return
 	}
 	token := s.jwtService.GenerateToken(update_user)
-	s.responder.ResponseSuccess(c, &map[string]interface{}{"token": token})
+	s.responder.ResponseSuccess(c, &map[string]interface{}{"token": token, "acknowledged": true})
 }
