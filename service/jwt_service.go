@@ -19,6 +19,7 @@ type authCustomClaims struct {
 	Username      string `json:"username"`
 	DisplayName   string `json:"displayName"`
 	DisplayImgUrl string `json:"displayImgUrl"`
+	Email         string `json:"email"`
 	jwt.StandardClaims
 }
 
@@ -48,6 +49,7 @@ func (s *jwtService) GenerateToken(user model.Users) string {
 		user.Username,
 		user.DisplayName,
 		user.DisplayImgUrl,
+		user.Email,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 48).Unix(),
 			Issuer:    s.issure,

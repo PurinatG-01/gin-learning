@@ -11,14 +11,15 @@ import (
 )
 
 type UserHandler struct {
-	service   service.UserService
-	responder utils.Responder
-	paginator utils.Paginator
+	userService service.UserService
+	jwtService  service.JWTService
+	responder   utils.Responder
+	paginator   utils.Paginator
 }
 
-func NewUserHandler(service service.UserService) *UserHandler {
+func NewUserHandler(userService service.UserService, jwtService service.JWTService) *UserHandler {
 
-	return &UserHandler{service: service, responder: utils.Responder{}, paginator: utils.Paginator{}}
+	return &UserHandler{userService: userService, jwtService: jwtService, responder: utils.Responder{}, paginator: utils.Paginator{}}
 }
 
 // UserGetPublic godoc
@@ -37,7 +38,7 @@ func (s *UserHandler) GetPublic(c *gin.Context) {
 		s.responder.ResponseError(c, param_err.Error())
 		return
 	}
-	user, err := s.service.GetPublic(id)
+	user, err := s.userService.GetPublic(id)
 	if err != nil {
 		s.responder.ResponseError(c, err.Error())
 		return
@@ -72,7 +73,7 @@ func (s *UserHandler) Tickets(c *gin.Context) {
 		s.responder.ResponseError(c, paginator_err.Error())
 		return
 	}
-	tickets, tickets_err := s.service.GetTicketsList(user_id, s.paginator.Page, s.paginator.Limit)
+	tickets, tickets_err := s.userService.GetTicketsList(user_id, s.paginator.Page, s.paginator.Limit)
 	if tickets_err != nil {
 		s.responder.ResponseError(c, tickets_err.Error())
 		return
@@ -107,10 +108,11 @@ func (s *UserHandler) Update(c *gin.Context) {
 		s.responder.ResponseError(c, bind_err.Error())
 		return
 	}
-	_, update_err := s.service.Update(user_id, form_user)
+	update_user, update_err := s.userService.Update(user_id, form_user)
 	if update_err != nil {
 		s.responder.ResponseError(c, update_err.Error())
 		return
 	}
-	s.responder.ResponseUpdateSuccess(c)
+	token := s.jwtService.GenerateToken(update_user)
+	s.responder.ResponseSuccess(c, &map[string]interface{}{"token": token})
 }

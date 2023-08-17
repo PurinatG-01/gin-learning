@@ -38,7 +38,7 @@ func (s *userAdapter) Get(id int) (model.Users, error) {
 }
 
 func (s *userAdapter) Update(user *model.Users) (bool, error) {
-	result := s.DB.Model(user).Updates(user)
+	result := s.DB.Model(user).Updates(user).Find(user)
 	return true, result.Error
 }
 

@@ -16,7 +16,7 @@ type UserService interface {
 	GetPublic(id int) (model.PublicUser, error)
 	GetTicketsList(userId int, page int, limit int) (model.Pagination[model.UsersAccess], error)
 	Delete(id int) (bool, error)
-	Update(id int, user model.UpdateFormUser) (bool, error)
+	Update(id int, user model.UpdateFormUser) (model.Users, error)
 	IsUsernameExist(username string) (bool, error)
 }
 
@@ -78,16 +78,16 @@ func (s *userService) Delete(id int) (bool, error) {
 	return true, nil
 }
 
-func (s *userService) Update(id int, user model.UpdateFormUser) (bool, error) {
+func (s *userService) Update(id int, user model.UpdateFormUser) (model.Users, error) {
 	updated_user := s.MapUpdateFormUserToUsers(user)
 	updated_user.Id = id
 	now := time.Now()
 	updated_user.UpdatedAt = &now
 	_, err := s.userRepository.Update(&updated_user)
 	if err != nil {
-		return true, err
+		return updated_user, err
 	}
-	return true, nil
+	return updated_user, nil
 }
 
 func (s *userService) IsUsernameExist(username string) (bool, error) {

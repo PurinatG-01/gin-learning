@@ -62,7 +62,7 @@ func NewApp() (*ApplicationContext, error) {
 	// #3.3 Init event handler
 	eventHandler := handler.NewEventHandler(eventService)
 	// #3.4 Init user handler
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := handler.NewUserHandler(userService, jwtService)
 	// #3.4 Init utility handler
 	utilityHandler := handler.NewUtilityHandler()
 	// #3.5 Init health handler
