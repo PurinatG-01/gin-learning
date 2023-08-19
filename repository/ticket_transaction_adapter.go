@@ -36,6 +36,14 @@ func (s *ticketTransactionAdapter) Get(id int) (model.TicketsTransaction, error)
 	return transaction, result.Error
 }
 
+func (s *ticketTransactionAdapter) ListByUserId(userId int, page int, limit int) (model.Pagination[model.TicketsTransaction], error) {
+	var ticket_transaction_list *[]model.TicketsTransaction
+	pagination := model.Pagination[model.TicketsTransaction]{Page: page, Limit: limit}
+	result := s.DB.Scopes(Paginate(ticket_transaction_list, &pagination, s.DB)).Preload("Event").Find(&ticket_transaction_list, "purchaser_id = ?", userId)
+	pagination.List = *ticket_transaction_list
+	return pagination, result.Error
+}
+
 func (s *ticketTransactionAdapter) Count(transaction *model.TicketsTransaction) (int64, error) {
 	var count int64
 	result := s.DB.Model(&model.TicketsTransaction{}).Where(transaction).Count(&count)
