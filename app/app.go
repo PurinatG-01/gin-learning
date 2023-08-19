@@ -44,7 +44,7 @@ func NewApp() (*ApplicationContext, error) {
 	// #2.0 Helper services
 	discordService := service.NewDiscordService()
 	// #2.1 Init authen/jwt/user services
-	userService := service.NewUserService(userRepository, usersAccessRepository)
+	userService := service.NewUserService(userRepository, usersAccessRepository, ticketTransactionRepository)
 	jwtService := service.NewJWTService()
 	loginService := service.NewLoginService(userRepository)
 	// #2.2 Init ticket service

@@ -50,6 +50,7 @@ func InitRoutes(engine *gin.Engine, app *ApplicationContext) {
 		userAuthen := user.Use(middleware.UserAuthorizeJWT())
 		{
 			userAuthen.GET("/tickets", app.User.Tickets)
+			userAuthen.GET("/transactions", app.User.Transactions)
 			userAuthen.PUT("/update", app.User.Update)
 		}
 	}

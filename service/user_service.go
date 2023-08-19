@@ -14,19 +14,21 @@ type UserService interface {
 	Create(user model.FormUser) (bool, error)
 	Get(id int) (model.Users, error)
 	GetPublic(id int) (model.PublicUser, error)
+	GetTransactionList(userId int, page int, limit int) (model.Pagination[model.TicketsTransaction], error)
 	GetTicketsList(userId int, page int, limit int) (model.Pagination[model.UsersAccess], error)
 	Delete(id int) (bool, error)
 	Update(id int, user model.UpdateFormUser) (model.Users, error)
 	IsUsernameExist(username string) (bool, error)
 }
 
-func NewUserService(userRepository repository.UserRepository, usersAccessRepository repository.UsersAccessRepository) UserService {
-	return &userService{userRepository: userRepository, usersAccessRepository: usersAccessRepository}
+func NewUserService(userRepository repository.UserRepository, usersAccessRepository repository.UsersAccessRepository, ticketsTransactionRepository repository.TicketTransactionRepository) UserService {
+	return &userService{userRepository: userRepository, usersAccessRepository: usersAccessRepository, ticketsTransactionRepository: ticketsTransactionRepository}
 }
 
 type userService struct {
-	userRepository        repository.UserRepository
-	usersAccessRepository repository.UsersAccessRepository
+	userRepository               repository.UserRepository
+	usersAccessRepository        repository.UsersAccessRepository
+	ticketsTransactionRepository repository.TicketTransactionRepository
 }
 
 func (s *userService) All() (*[]model.Users, error) {
@@ -66,6 +68,11 @@ func (s *userService) GetPublic(id int) (model.PublicUser, error) {
 
 func (s *userService) GetTicketsList(userId int, page int, limit int) (model.Pagination[model.UsersAccess], error) {
 	events_pagination, err := s.usersAccessRepository.ListByUserId(userId, page, limit)
+	return events_pagination, err
+}
+
+func (s *userService) GetTransactionList(userId int, page int, limit int) (model.Pagination[model.TicketsTransaction], error) {
+	events_pagination, err := s.ticketsTransactionRepository.ListByUserId(userId, page, limit)
 	return events_pagination, err
 }
 

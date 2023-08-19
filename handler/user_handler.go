@@ -86,6 +86,41 @@ func (s *UserHandler) Tickets(c *gin.Context) {
 }
 
 // UserTickets godoc
+// @description Get user's transaction by user id
+// @tags User
+// @id UserTransactionHandler
+// @security JWT
+// @produce json
+// @param page query int true "page of the list"
+// @param limit query int true "limit of the list"
+// @response 200 {object} utils.ApiResponse
+// @response 400 {object} utils.ApiResponse
+// @Router /user/tickets [get]
+func (s *UserHandler) Transactions(c *gin.Context) {
+	str_user_id := c.GetString("x-user-id")
+	user_id, param_err := strconv.Atoi(str_user_id)
+	if param_err != nil {
+		s.responder.ResponseError(c, param_err.Error())
+		return
+	}
+	paginator_err := s.paginator.Bind(c)
+	if paginator_err != nil {
+		s.responder.ResponseError(c, paginator_err.Error())
+		return
+	}
+	tickets, tickets_err := s.userService.GetTransactionList(user_id, s.paginator.Page, s.paginator.Limit)
+	if tickets_err != nil {
+		s.responder.ResponseError(c, tickets_err.Error())
+		return
+	}
+	marshal_event, _ := json.Marshal(&tickets)
+	var data map[string]interface{}
+	_ = json.Unmarshal(marshal_event, &data)
+	s.responder.ResponseSuccess(c, &data)
+	return
+}
+
+// UserTickets godoc
 // @description Update user basic info
 // @tags User
 // @id UserUpdateHandler

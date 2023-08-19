@@ -29,6 +29,7 @@ type TicketsTransaction struct {
 	UpdatedAt     *time.Time `gorm:"updated_at" json:"updatedAt"`
 	TransactionId string     `gorm:"transaction_id" json:"transactionId"`
 	Status        string     `gorm:"status" json:"status"`
+	Event         Events     `json:"event"`
 }
 
 func (s *TicketsTransaction) BeforeCreate(tx *gorm.DB) (err error) {
