@@ -9,7 +9,10 @@ import (
 
 func Paginate[T any](value interface{}, pagination *model.Pagination[T], db *gorm.DB) func(db *gorm.DB) *gorm.DB {
 	var totalRows int64
-	db.Model(value).Count(&totalRows)
+
+	// Copy the current database instance to preserve the original filter
+	filteredDB := db.Session(&gorm.Session{})
+	filteredDB.Model(value).Count(&totalRows)
 	pagination.TotalRows = totalRows
 	totalPages := int(math.Ceil(float64(totalRows) / float64(pagination.Limit)))
 	pagination.TotalPages = totalPages

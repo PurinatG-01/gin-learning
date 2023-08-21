@@ -14,7 +14,7 @@ type UserService interface {
 	Create(user model.FormUser) (bool, error)
 	Get(id int) (model.Users, error)
 	GetPublic(id int) (model.PublicUser, error)
-	GetTransactionList(userId int, page int, limit int) (model.Pagination[model.TicketsTransaction], error)
+	GetTransactionList(userId int, page int, limit int, status model.OmiseChargeStatus, order model.OrderBy) (model.Pagination[model.TicketsTransaction], error)
 	GetTicketsList(userId int, page int, limit int) (model.Pagination[model.UsersAccess], error)
 	Delete(id int) (bool, error)
 	Update(id int, user model.UpdateFormUser) (model.Users, error)
@@ -71,8 +71,8 @@ func (s *userService) GetTicketsList(userId int, page int, limit int) (model.Pag
 	return events_pagination, err
 }
 
-func (s *userService) GetTransactionList(userId int, page int, limit int) (model.Pagination[model.TicketsTransaction], error) {
-	events_pagination, err := s.ticketsTransactionRepository.ListByUserId(userId, page, limit)
+func (s *userService) GetTransactionList(userId int, page int, limit int, status model.OmiseChargeStatus, order model.OrderBy) (model.Pagination[model.TicketsTransaction], error) {
+	events_pagination, err := s.ticketsTransactionRepository.ListByUserId(userId, page, limit, status, order)
 	return events_pagination, err
 }
 

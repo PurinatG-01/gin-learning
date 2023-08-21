@@ -36,3 +36,8 @@ func (s *TicketsTransaction) BeforeCreate(tx *gorm.DB) (err error) {
 	s.Id = uuid.New().String()
 	return
 }
+
+type FormTicketTransactionList struct {
+	OrderBy OrderBy           `form:"orderBy"`
+	Status  OmiseChargeStatus `form:"status"`
+}

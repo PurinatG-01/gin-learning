@@ -6,6 +6,7 @@ import (
 	model "gin-learning/models"
 	"log"
 
+	"github.com/omise/omise-go"
 	"gorm.io/gorm"
 )
 
@@ -36,10 +37,21 @@ func (s *ticketTransactionAdapter) Get(id int) (model.TicketsTransaction, error)
 	return transaction, result.Error
 }
 
-func (s *ticketTransactionAdapter) ListByUserId(userId int, page int, limit int) (model.Pagination[model.TicketsTransaction], error) {
+func (s *ticketTransactionAdapter) ListByUserId(userId int, page int, limit int, status omise.ChargeStatus, order model.OrderBy) (model.Pagination[model.TicketsTransaction], error) {
 	var ticket_transaction_list *[]model.TicketsTransaction
-	pagination := model.Pagination[model.TicketsTransaction]{Page: page, Limit: limit}
-	result := s.DB.Scopes(Paginate(ticket_transaction_list, &pagination, s.DB)).Preload("Event").Find(&ticket_transaction_list, "purchaser_id = ?", userId)
+	pagination := model.Pagination[model.TicketsTransaction]{Page: page, Limit: limit, Sort: fmt.Sprintf("created_at %s", order)}
+	result := s.DB.Preload("Event")
+	if order == "" {
+		result = result.Order("created_at desc")
+	} else {
+		result = result.Order(fmt.Sprintf("created_at %s", order))
+	}
+	if status == "" {
+		result = result.Find(&ticket_transaction_list, "purchaser_id = ?", userId)
+	} else {
+		result = result.Find(&ticket_transaction_list, "purchaser_id = ? AND status = ?", userId, status)
+	}
+	result = result.Scopes(Paginate(ticket_transaction_list, &pagination, result))
 	pagination.List = *ticket_transaction_list
 	return pagination, result.Error
 }

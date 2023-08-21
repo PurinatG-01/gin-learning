@@ -93,6 +93,8 @@ func (s *UserHandler) Tickets(c *gin.Context) {
 // @produce json
 // @param page query int true "page of the list"
 // @param limit query int true "limit of the list"
+// @param status query omise.ChargeStatus false "status of the list"
+// @param orderBy query string false "order by asc or desc of the list"
 // @response 200 {object} utils.ApiResponse
 // @response 400 {object} utils.ApiResponse
 // @Router /user/tickets [get]
@@ -108,7 +110,13 @@ func (s *UserHandler) Transactions(c *gin.Context) {
 		s.responder.ResponseError(c, paginator_err.Error())
 		return
 	}
-	tickets, tickets_err := s.userService.GetTransactionList(user_id, s.paginator.Page, s.paginator.Limit)
+	form_tickets_transaction_list := model.FormTicketTransactionList{}
+	bind_err := c.Bind(&form_tickets_transaction_list)
+	if bind_err != nil {
+		s.responder.ResponseError(c, bind_err.Error())
+		return
+	}
+	tickets, tickets_err := s.userService.GetTransactionList(user_id, s.paginator.Page, s.paginator.Limit, form_tickets_transaction_list.Status, form_tickets_transaction_list.OrderBy)
 	if tickets_err != nil {
 		s.responder.ResponseError(c, tickets_err.Error())
 		return
