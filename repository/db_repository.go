@@ -3,7 +3,6 @@ package repository
 import (
 	model "gin-learning/models"
 
-	"github.com/omise/omise-go"
 	"gorm.io/gorm"
 )
 
@@ -61,7 +60,7 @@ type TicketTransactionRepository interface {
 	Create(ticketTransaction *model.TicketsTransaction) (model.TicketsTransaction, error)
 	CreateMultiple(ticketsList *[]model.TicketsTransaction, batchSize int) ([]model.TicketsTransaction, error)
 	Get(id int) (model.TicketsTransaction, error)
-	ListByUserId(userId int, page int, limit int, status omise.ChargeStatus, order model.OrderBy) (model.Pagination[model.TicketsTransaction], error)
+	ListByUserId(userId int, page int, limit int, status model.OmiseChargeStatus, order model.OrderBy) (model.Pagination[model.TicketsTransaction], error)
 	GetByKey(key string, value string) (model.TicketsTransaction, error, int)
 	UpdateByKey(fkey string, fvalue any, skey string, svalue any) (bool, error)
 	Count(transaction *model.TicketsTransaction) (int64, error)

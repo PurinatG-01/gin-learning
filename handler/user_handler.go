@@ -93,8 +93,8 @@ func (s *UserHandler) Tickets(c *gin.Context) {
 // @produce json
 // @param page query int true "page of the list"
 // @param limit query int true "limit of the list"
-// @param status query omise.ChargeStatus false "status of the list"
-// @param orderBy query string false "order by asc or desc of the list"
+// @param status query model.OmiseChargeStatus false "status of the list"
+// @param orderBy query model.OrderBy false "order by asc or desc of the list"
 // @response 200 {object} utils.ApiResponse
 // @response 400 {object} utils.ApiResponse
 // @Router /user/tickets [get]

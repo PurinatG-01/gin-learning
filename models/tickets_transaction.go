@@ -13,6 +13,7 @@ type OmiseChargeStatus = omise.ChargeStatus
 const (
 	OMISE_CURRENCY_RATE_TH                           = 100
 	OMISE_CHARGE_SCOPE             omise.SearchScope = omise.ChargeScope
+	OMISE_CHARGE_STATUS_ALL        OmiseChargeStatus = "all"
 	OMISE_CHARGE_STATUS_PENDING    OmiseChargeStatus = omise.ChargePending
 	OMISE_CHARGE_STATUS_FAILED     OmiseChargeStatus = omise.ChargeFailed
 	OMISE_CHARGE_STATUS_SUCCESSFUL OmiseChargeStatus = omise.ChargeSuccessful

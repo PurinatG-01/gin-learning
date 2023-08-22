@@ -46,12 +46,12 @@ func (s *ticketTransactionAdapter) ListByUserId(userId int, page int, limit int,
 	} else {
 		result = result.Order(fmt.Sprintf("created_at %s", order))
 	}
-	if status == "" {
-		result = result.Find(&ticket_transaction_list, "purchaser_id = ?", userId)
+	if status == "" || status == model.OMISE_CHARGE_STATUS_ALL {
+		result = result.Where("purchaser_id = ?", userId)
 	} else {
-		result = result.Find(&ticket_transaction_list, "purchaser_id = ? AND status = ?", userId, status)
+		result = result.Where("purchaser_id = ? AND status = ?", userId, status)
 	}
-	result = result.Scopes(Paginate(ticket_transaction_list, &pagination, result))
+	result = result.Scopes(Paginate(ticket_transaction_list, &pagination, result)).Find(&ticket_transaction_list)
 	pagination.List = *ticket_transaction_list
 	return pagination, result.Error
 }
