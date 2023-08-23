@@ -302,6 +302,79 @@ paths:
       - User
   /user/tickets:
     get:
+      description: Get user's ticket by user id
+      operationId: UserTicketsHandler
+      parameters:
+      - description: page of the list
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: limit of the list
+        in: query
+        name: limit
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      security:
+      - JWT: []
+      tags:
+      - User
+  /user/transactions:
+    get:
+      description: Get user's transaction by user id
+      operationId: UserTransactionHandler
+      parameters:
+      - description: page of the list
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: limit of the list
+        in: query
+        name: limit
+        required: true
+        type: integer
+      - description: status of the list
+        in: query
+        name: status
+        required: true
+        type: string
+      - description: order by asc or desc of the list
+        enum:
+        - ASC
+        - DESC
+        in: query
+        name: orderBy
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.ApiResponse'
+      security:
+      - JWT: []
+      tags:
+      - User
+  /user/update:
+    put:
       description: Update user basic info
       operationId: UserUpdateHandler
       parameters:
