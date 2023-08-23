@@ -93,11 +93,11 @@ func (s *UserHandler) Tickets(c *gin.Context) {
 // @produce json
 // @param page query int true "page of the list"
 // @param limit query int true "limit of the list"
-// @param status query model.OmiseChargeStatus false "status of the list"
-// @param orderBy query model.OrderBy false "order by asc or desc of the list"
+// @param status query string true "status of the list"
+// @param orderBy query model.OrderBy true "order by asc or desc of the list"
 // @response 200 {object} utils.ApiResponse
 // @response 400 {object} utils.ApiResponse
-// @Router /user/tickets [get]
+// @Router /user/transactions [get]
 func (s *UserHandler) Transactions(c *gin.Context) {
 	str_user_id := c.GetString("x-user-id")
 	user_id, param_err := strconv.Atoi(str_user_id)
@@ -137,7 +137,7 @@ func (s *UserHandler) Transactions(c *gin.Context) {
 // @param body formData model.UpdateFormUser true "User data to be update"
 // @response 204 {object} utils.ApiResponse
 // @response 400 {object} utils.ApiResponse
-// @Router /user/tickets [get]
+// @Router /user/update [put]
 func (s *UserHandler) Update(c *gin.Context) {
 	str_user_id := c.GetString("x-user-id")
 	user_id, param_err := strconv.Atoi(str_user_id)
